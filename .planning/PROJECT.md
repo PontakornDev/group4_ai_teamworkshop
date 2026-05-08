@@ -17,16 +17,16 @@ A user can log in, swipe on dogs, and have their swipes saved — the loop must 
 ### Validated (v0.1)
 
 - App fetches random dog image from random.dog, skips .mp4 URLs ✓ (Phase 1)
-- Swipe records saved to /data/swipes.json with dogId, imageUrl, action, username, timestamp ✓ (Phase 1)
+- Swipe records saved to /data/swipes.json grouped by dog: `{dogId, imageUrl, col: [{username, action, timestamp}]}` ✓ (Phase 1)
 - History readable from /data/swipes.json ✓ (Phase 1)
 
 ### Active
 
 - [ ] User can enter a username on /login and be redirected to the swipe page
 - [ ] Username is stored in sessionStorage and required before accessing /swipe
-- [ ] App fetches random dog image from random.dog API (skips .mp4 URLs)
+- [ ] GET /api/dog?username= serves an unseen dog from storage first; falls back to random.dog only when none available (skips .mp4 URLs)
 - [ ] User can swipe right (like) or left (dislike) on a dog image
-- [ ] Each swipe is saved to /data/swipes.json with dogId, imageUrl, action, username, timestamp
+- [ ] Each swipe appends `{username, action, timestamp}` to the dog's `col` array in /data/swipes.json via lib/storage.ts appendAction
 - [ ] Username is visible in the navbar while swiping
 
 ### Out of Scope

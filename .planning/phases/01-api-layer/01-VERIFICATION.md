@@ -4,7 +4,9 @@ verified: 2026-05-08T02:47:30Z
 status: human_needed
 score: 4/4 must-haves verified
 overrides_applied: 0
-re_verification: false
+re_verification: true
+re_verification_reason: "Schema patch (01-02-PATCH) — grouped DogRecord schema, findUnseenDog, appendAction, unseen-first GET /api/dog"
+re_verified: 2026-05-08
 human_verification:
   - test: "Start dev server (`npm run dev`) and curl GET /api/dog"
     expected: "HTTP 200 with JSON body {url: '<image URL ending in .jpg/.png/.gif/.webp>', dogId: '<extracted id>'} — URL must NOT end in .mp4"
@@ -33,8 +35,8 @@ human_verification:
 |---|-------|--------|----------|
 | 1 | GET /api/dog returns a JSON response with a valid image URL (jpg/png) and extracted dogId | VERIFIED | `app/api/dog/route.ts`: fetches `https://random.dog/woof.json`, returns `{url, dogId}`. 4/4 unit tests pass (image URL, mp4 retry, 5-attempt exhaustion, webp). |
 | 2 | GET /api/dog never returns a .mp4 URL — it retries until an image is found | VERIFIED | `app/api/dog/route.ts` lines 16-28: `IMAGE_EXTENSIONS` allowlist + `MAX_ATTEMPTS = 5` loop; returns 500 after exhaustion. Test confirms exactly 5 fetch calls on all-.mp4 sequence. |
-| 3 | POST /api/swipe with a valid body writes a record to /data/swipes.json and returns success | VERIFIED | `app/api/swipe/route.ts`: validates all 4 fields, generates `timestamp: new Date().toISOString()`, calls `appendSwipe(record)`, returns saved record. Integration test confirms save+return. |
-| 4 | GET /api/history returns the full list of swipe records from /data/swipes.json | VERIFIED | `app/api/history/route.ts`: calls `readSwipes()` and returns the array. Returns `[]` on fresh install (confirmed by test). POST→GET e2e test confirms record appears in history. |
+| 3 | POST /api/swipe with a valid body upserts /data/swipes.json and returns the updated DogRecord | VERIFIED | `app/api/swipe/route.ts`: validates all 4 fields, calls `appendAction(dogId, imageUrl, username, action)`, returns DogRecord with col array. Integration test confirms upsert + response shape. |
+| 4 | GET /api/history returns the full list of DogRecord entries from /data/swipes.json | VERIFIED | `app/api/history/route.ts`: calls `readDogs()` and returns the array. Returns `[]` on fresh install. POST→GET e2e test confirms record appears with col entry. |
 
 **Score:** 4/4 truths verified
 
@@ -42,7 +44,7 @@ human_verification:
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `lib/storage.ts` | Shared bootstrap-aware JSON I/O — exports `ensureStore`, `readSwipes`, `appendSwipe`, `SwipeRecord` | VERIFIED | All 4 exports present, substantive (36 lines), no stubs. Imported by both swipe and history routes. |
+| `lib/storage.ts` | Shared bootstrap-aware JSON I/O — exports `ensureStore`, `readDogs`, `findUnseenDog`, `appendAction`, `DogRecord`, `SwipeAction` | VERIFIED | All exports present, grouped-schema DogRecord, findUnseenDog+appendAction upsert. Imported by dog, swipe, and history routes. |
 | `app/api/dog/route.ts` | GET /api/dog — random.dog fetch with retry | VERIFIED | 29 lines, real implementation with `IMAGE_EXTENSIONS`, `MAX_ATTEMPTS`, `extractDogId`. Exports `GET`. |
 | `app/api/swipe/route.ts` | POST /api/swipe — saves swipe record to disk | VERIFIED | 37 lines, full input validation (4 fields), server-generated timestamp, calls `appendSwipe`. Exports `POST` only (no GET — correct per D-01). |
 | `app/api/history/route.ts` | GET /api/history — reads all swipe records | VERIFIED | 7 lines, calls `readSwipes()`, returns result. Exports `GET`. |
@@ -52,8 +54,9 @@ human_verification:
 | From | To | Via | Status | Details |
 |------|-----|-----|--------|---------|
 | `app/api/dog/route.ts` | `https://random.dog/woof.json` | `fetch(RANDOM_DOG_URL, {cache:'no-store'})` | WIRED | `RANDOM_DOG_URL = "https://random.dog/woof.json"` on line 3; `fetch(RANDOM_DOG_URL, ...)` on line 17. woof.json is referenced. |
-| `app/api/swipe/route.ts` | `lib/storage.ts` | `appendSwipe(record)` | WIRED | `import { appendSwipe, SwipeRecord } from "@/lib/storage"` on line 2; `appendSwipe(record)` called on line 35. |
-| `app/api/history/route.ts` | `lib/storage.ts` | `readSwipes()` | WIRED | `import { readSwipes } from "@/lib/storage"` on line 2; `readSwipes()` called on line 5. |
+| `app/api/dog/route.ts` | `lib/storage.ts` | `findUnseenDog(username)` | WIRED | `import { findUnseenDog } from "@/lib/storage"`; called when username query param present before random.dog fetch. |
+| `app/api/swipe/route.ts` | `lib/storage.ts` | `appendAction(dogId, imageUrl, username, action)` | WIRED | `import { appendAction } from "@/lib/storage"`; upserts DogRecord, pushes SwipeAction into col. |
+| `app/api/history/route.ts` | `lib/storage.ts` | `readDogs()` | WIRED | `import { readDogs } from "@/lib/storage"`; returns DogRecord[]. |
 
 ### Data-Flow Trace (Level 4)
 
@@ -67,7 +70,7 @@ human_verification:
 
 | Behavior | Command | Result | Status |
 |----------|---------|--------|--------|
-| All 15 unit/integration tests pass | `npm test` | `Test Files 3 passed (3), Tests 15 passed (15)` | PASS |
+| All 22 unit/integration tests pass | `npm test` | `Test Files 3 passed (3), Tests 22 passed (22)` | PASS |
 | No GET handler on /api/swipe (D-01) | `grep "export async function GET" app/api/swipe/route.ts` | 0 matches | PASS |
 | /data/ in .gitignore | `grep "/data/" .gitignore` | Found at line 44 | PASS |
 | Server-side timestamp generated | Code read: line 32 of swipe/route.ts | `timestamp: new Date().toISOString()` confirmed | PASS |
@@ -80,7 +83,7 @@ human_verification:
 |-------------|------------|-------------|--------|----------|
 | DOG-01 | 01-01-PLAN.md | App fetches a random dog image URL from random.dog API and extracts the dogId | SATISFIED | `app/api/dog/route.ts` fetches `woof.json`, extracts dogId via `split('/').pop().replace(/\.[^.]+$/, '')`. 4 unit tests pass. |
 | DOG-02 | 01-01-PLAN.md | API route retries automatically if random.dog returns a non-image URL (.mp4) | SATISFIED | `IMAGE_EXTENSIONS` allowlist + `MAX_ATTEMPTS = 5` retry loop. Test confirms 5 fetch calls before 500. |
-| SWIPE-01 | 01-01-PLAN.md | POST /api/swipe saves a swipe record {dogId, imageUrl, action, username, timestamp} to /data/swipes.json | SATISFIED | `app/api/swipe/route.ts` validates all fields, calls `appendSwipe()`, returns full record. Integration test confirms. |
+| SWIPE-01 | 01-01-PLAN.md | POST /api/swipe upserts swipes.json — appends {username, action, timestamp} to dog's col array | SATISFIED | `app/api/swipe/route.ts` validates all fields, calls `appendAction()`, returns DogRecord. Integration test confirms upsert+response. |
 | SWIPE-02 | 01-01-PLAN.md | GET /api/history reads all records from /data/swipes.json | SATISFIED | `app/api/history/route.ts` calls `readSwipes()`. Returns `[]` on fresh install. POST→GET test confirms record retrieval. |
 
 No orphaned requirements found — all 4 IDs from the PLAN frontmatter are accounted for and have implementation evidence.
@@ -115,7 +118,7 @@ curl http://localhost:3000/api/history
 
 cat data/swipes.json
 ```
-**Expected:** POST returns 200 with `{dogId, imageUrl, action, username, timestamp}`. GET /api/history returns `[{dogId:"test123",...}]`. `data/swipes.json` file exists on disk at the project root with the record written (directory auto-created if it didn't exist).
+**Expected:** POST returns 200 with `{dogId, imageUrl, col: [{username, action, timestamp}]}`. GET /api/history returns `[{dogId:"test123", imageUrl:"...", col:[{username:"alice", action:"like", timestamp:"..."}]}]`. `data/swipes.json` file exists on disk at the project root with the grouped record written (directory auto-created if it didn't exist).
 **Why human:** Tests mock `process.cwd()` to a temp directory. Production cwd behavior — creating `/data/` directory and writing to `swipes.json` in the actual project root — has never been exercised end-to-end.
 
 ---

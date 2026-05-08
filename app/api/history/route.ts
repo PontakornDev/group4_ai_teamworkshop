@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { readSwipes } from "@/lib/storage";
+import { readDogs } from "@/lib/storage";
 
 export async function GET(): Promise<NextResponse> {
-  const records = await readSwipes();
+  const records = await readDogs();
   return NextResponse.json(records);
 }

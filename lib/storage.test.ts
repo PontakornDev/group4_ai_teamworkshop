@@ -3,9 +3,6 @@ import fs from "fs/promises";
 import os from "os";
 import path from "path";
 
-// Mock process.cwd() to point to a temp dir so storage.ts
-// uses a temp location during tests. Re-import storage after mocking.
-
 let tmpDir: string;
 
 beforeEach(async () => {
@@ -18,7 +15,6 @@ afterEach(async () => {
   await fs.rm(tmpDir, { recursive: true, force: true });
 });
 
-// Dynamic import after cwd mock is set (no .js extension — Vitest resolves .ts)
 async function getStorage() {
   vi.resetModules();
   return import("./storage");
@@ -43,37 +39,75 @@ describe("ensureStore", () => {
   });
 });
 
-describe("readSwipes", () => {
+describe("readDogs", () => {
   it("returns empty array on fresh install", async () => {
-    const { readSwipes } = await getStorage();
-    const result = await readSwipes();
+    const { readDogs } = await getStorage();
+    const result = await readDogs();
     expect(result).toEqual([]);
   });
 });
 
-describe("appendSwipe", () => {
-  it("returns the written record", async () => {
-    const { appendSwipe } = await getStorage();
-    const record = { dogId: "x", imageUrl: "y", action: "like" as const, username: "z", timestamp: "t" };
-    const result = await appendSwipe(record);
-    expect(result).toEqual(record);
-  });
-
-  it("persists record — subsequent readSwipes includes it", async () => {
-    const { appendSwipe, readSwipes } = await getStorage();
-    const record = { dogId: "abc", imageUrl: "http://example.com/dog.jpg", action: "dislike" as const, username: "alice", timestamp: "2026-05-08T10:00:00Z" };
-    await appendSwipe(record);
-    const all = await readSwipes();
+describe("appendAction", () => {
+  it("creates new dog record when dogId does not exist", async () => {
+    const { appendAction, readDogs } = await getStorage();
+    const result = await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
+    expect(result.dogId).toBe("dog1");
+    expect(result.imageUrl).toBe("https://example.com/dog1.jpg");
+    expect(result.col).toHaveLength(1);
+    expect(result.col[0].username).toBe("alice");
+    expect(result.col[0].action).toBe("like");
+    expect(result.col[0].timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    const all = await readDogs();
     expect(all).toHaveLength(1);
-    expect(all[0]).toEqual(record);
   });
 
-  it("appends — two calls produce array of length 2", async () => {
-    const { appendSwipe, readSwipes } = await getStorage();
-    const r = { dogId: "a", imageUrl: "u", action: "like" as const, username: "u", timestamp: "t" };
-    await appendSwipe(r);
-    await appendSwipe({ ...r, dogId: "b" });
-    const all = await readSwipes();
+  it("appends to col when dogId already exists", async () => {
+    const { appendAction, readDogs } = await getStorage();
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "bob", "dislike");
+    const all = await readDogs();
+    expect(all).toHaveLength(1);
+    expect(all[0].col).toHaveLength(2);
+    expect(all[0].col[1].username).toBe("bob");
+    expect(all[0].col[1].action).toBe("dislike");
+  });
+
+  it("two different dogs produce two records", async () => {
+    const { appendAction, readDogs } = await getStorage();
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
+    await appendAction("dog2", "https://example.com/dog2.jpg", "alice", "dislike");
+    const all = await readDogs();
     expect(all).toHaveLength(2);
+  });
+});
+
+describe("findUnseenDog", () => {
+  it("returns null when storage is empty", async () => {
+    const { findUnseenDog } = await getStorage();
+    const result = await findUnseenDog("alice");
+    expect(result).toBeNull();
+  });
+
+  it("returns dog record that username has not swiped on", async () => {
+    const { appendAction, findUnseenDog } = await getStorage();
+    await appendAction("dog1", "https://example.com/dog1.jpg", "bob", "like");
+    const result = await findUnseenDog("alice");
+    expect(result).not.toBeNull();
+    expect(result!.dogId).toBe("dog1");
+  });
+
+  it("returns null when all dogs already swiped by username", async () => {
+    const { appendAction, findUnseenDog } = await getStorage();
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
+    const result = await findUnseenDog("alice");
+    expect(result).toBeNull();
+  });
+
+  it("skips swiped dogs and returns unseen one", async () => {
+    const { appendAction, findUnseenDog } = await getStorage();
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
+    await appendAction("dog2", "https://example.com/dog2.jpg", "bob", "like");
+    const result = await findUnseenDog("alice");
+    expect(result!.dogId).toBe("dog2");
   });
 });

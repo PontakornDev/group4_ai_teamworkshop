@@ -15,6 +15,8 @@ A history page shows all past swipe records.
 - Storage: Local JSON file at /data/swipes.json (via Node.js fs on API routes)
 
 ## API Details
+
+### External: random.dog
 - Endpoint: GET https://random.dog/woof.json
 - No API key required
 - Returns: { "fileSizeBytes": 123456, "url": "https://random.dog/abc123.jpg" }
@@ -23,14 +25,27 @@ A history page shows all past swipe records.
   - ID → "d40de385-3626-46c8-94bf-b7097226174f"
 - Note: some URLs may be .mp4 — skip and fetch again if not an image
 
+### GET /api/dog?username=<name>
+Serves an unseen dog to the requesting user. Logic (in order):
+1. Read swipes.json via lib/storage.ts findUnseenDog(username)
+2. If a dog record exists where username does NOT appear in col → return that record (url + dogId) without calling random.dog
+3. If all existing dogs already have this username in col (or swipes.json is empty) → call random.dog API to fetch a new dog, then return it
+
+### POST /api/swipe
+Body: { dogId, imageUrl, username, action }
+Logic via lib/storage.ts appendAction(dogId, imageUrl, username, action):
+- If dogId already exists in swipes.json → push { username, action, timestamp } into its col array
+- If dogId does not exist → create new record { dogId, imageUrl, col: [{ username, action, timestamp }] }
+
 ## Data Schema (swipes.json)
+Records are grouped by dog — one entry per dogId, multiple user actions in col array.
 [
   {
-    "dogId": "d40de385-3626-46c8-94bf-b7097226174f",
-    "imageUrl": "https://random.dog/d40de385-3626-46c8-94bf-b7097226174f.jpg",
-    "action": "like" | "dislike",
-    "username": "john_doe",
-    "timestamp": "2026-05-08T10:00:00Z"
+    "dogId": "string",
+    "imageUrl": "string",
+    "col": [
+      { "username": "string", "action": "like" | "dislike", "timestamp": "ISO string" }
+    ]
   }
 ]
 
@@ -48,22 +63,24 @@ A history page shows all past swipe records.
   /swipe/page.tsx          — Main swipe page (protected: requires username)
   /history/page.tsx        — History page — shows all swipe records
   /api
-    /dog/route.ts          — GET: fetch random dog from random.dog, extract ID from URL
-    /swipe/route.ts        — POST: save swipe result (with username) to JSON
-    /history/route.ts      — GET: read swipe history from JSON
+    /dog/route.ts          — GET ?username=: serve unseen dog from storage, else fetch from random.dog
+    /swipe/route.ts        — POST: appendAction upsert into swipes.json via lib/storage.ts
+    /history/route.ts      — GET: read all swipe records from swipes.json
+/lib
+  /storage.ts              — findUnseenDog(username), appendAction(dogId, imageUrl, username, action)
 /data
-  /swipes.json             — Persistent swipe storage
+  /swipes.json             — Persistent swipe storage (grouped by dog)
 /components
   /SwipeCard.tsx           — Dog card with swipe animation
   /SwipeButtons.tsx        — Like/Dislike buttons
-  /HistoryList.tsx         — List of past swipes, shows username per record
+  /HistoryList.tsx         — List of dog records from swipes.json, shows col entries (username/action/timestamp) per dog
   /Navbar.tsx              — Top bar showing current username + logout button
 
 ## Milestones
-1. API Layer — random.dog integration + JSON read/write with username field
+1. API Layer — random.dog integration + swipes.json grouped schema + lib/storage.ts (findUnseenDog, appendAction)
 2. Login Page — username form + sessionStorage + redirect guard
-3. Swipe UI — Card display + swipe interaction + username in POST
-4. History Page — Display past swipe records with username column
+3. Swipe UI — Card display + swipe interaction + GET /api/dog?username= unseen-first logic
+4. History Page — Display past swipe records with col array entries per dog
 5. Polish — Animations, empty states, error handling, skip .mp4 urls
 
 ## Decisions Made
@@ -75,6 +92,9 @@ A history page shows all past swipe records.
 - Dog ID extracted from URL via split("/").pop() then remove extension
 - Skip .mp4 and non-image URLs from random.dog — fetch again automatically
 - data/swipes.json should be in .gitignore to avoid team conflicts
+- swipes.json grouped by dog (not per-swipe) — one record per dogId, col array holds all users' actions on that dog
+- GET /api/dog?username= serves unseen dogs first — avoids redundant random.dog calls when storage has unseen dogs
+- lib/storage.ts owns all JSON read/write — routes call findUnseenDog/appendAction, never read fs directly
 
 ## Design Reference
 - UI design exported from Stitch — located at /design/**/*.md and /design/**/*.html

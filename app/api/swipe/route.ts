@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { appendSwipe, SwipeRecord } from "@/lib/storage";
+import { appendAction } from "@/lib/storage";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   let body: unknown;
@@ -24,14 +24,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Missing or invalid username" }, { status: 400 });
   }
 
-  const record: SwipeRecord = {
-    dogId,
-    imageUrl,
-    action,
-    username,
-    timestamp: new Date().toISOString(),
-  };
-
-  const saved = await appendSwipe(record);
+  const saved = await appendAction(dogId, imageUrl, username, action);
   return NextResponse.json(saved);
 }

@@ -4,12 +4,16 @@ import path from "path";
 const DATA_DIR = path.join(process.cwd(), "data");
 const SWIPES_FILE = path.join(DATA_DIR, "swipes.json");
 
-export interface SwipeRecord {
+export interface SwipeAction {
+  username: string;
+  action: "like" | "dislike";
+  timestamp: string;
+}
+
+export interface DogRecord {
   dogId: string;
   imageUrl: string;
-  action: "like" | "dislike";
-  username: string;
-  timestamp: string;
+  col: SwipeAction[];
 }
 
 export async function ensureStore(): Promise<void> {
@@ -21,16 +25,32 @@ export async function ensureStore(): Promise<void> {
   }
 }
 
-export async function readSwipes(): Promise<SwipeRecord[]> {
+export async function readDogs(): Promise<DogRecord[]> {
   await ensureStore();
   const raw = await fs.readFile(SWIPES_FILE, "utf-8");
-  return JSON.parse(raw) as SwipeRecord[];
+  return JSON.parse(raw) as DogRecord[];
 }
 
-export async function appendSwipe(record: SwipeRecord): Promise<SwipeRecord> {
+export async function findUnseenDog(username: string): Promise<DogRecord | null> {
+  const dogs = await readDogs();
+  return dogs.find((d) => !d.col.some((a) => a.username === username)) ?? null;
+}
+
+export async function appendAction(
+  dogId: string,
+  imageUrl: string,
+  username: string,
+  action: "like" | "dislike"
+): Promise<DogRecord> {
   await ensureStore();
-  const records = await readSwipes();
-  records.push(record);
-  await fs.writeFile(SWIPES_FILE, JSON.stringify(records, null, 2), "utf-8");
-  return record;
+  const dogs = await readDogs();
+  const entry: SwipeAction = { username, action, timestamp: new Date().toISOString() };
+  const existing = dogs.find((d) => d.dogId === dogId);
+  if (existing) {
+    existing.col.push(entry);
+  } else {
+    dogs.push({ dogId, imageUrl, col: [entry] });
+  }
+  await fs.writeFile(SWIPES_FILE, JSON.stringify(dogs, null, 2), "utf-8");
+  return dogs.find((d) => d.dogId === dogId)!;
 }
