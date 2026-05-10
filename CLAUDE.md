@@ -1,7 +1,7 @@
 # Dog Tinder — Project Memory
 
 ## Project Overview
-A Tinder-like app for dogs. Users must enter a username on the first page before swiping.
+A Tinder-like app for dogs. Users sign in with Google before swiping.
 Users swipe right (like) or left (dislike) on random dog images.
 Data is fetched from random.dog API. Swipe results are stored in a local JSON file,
 recording which user performed each action.
@@ -11,6 +11,7 @@ A history page shows all past swipe records.
 - Framework: Next.js 14+ (App Router)
 - Language: TypeScript
 - Styling: Tailwind CSS
+- Auth: NextAuth.js (next-auth) with Google provider
 - External API: https://random.dog/woof.json
 - Storage: Local JSON file at /data/swipes.json (via Node.js fs on API routes)
 
@@ -32,10 +33,10 @@ Serves an unseen dog to the requesting user. Logic (in order):
 3. If all existing dogs already have this username in col (or swipes.json is empty) → call random.dog API to fetch a new dog, then return it
 
 ### POST /api/swipe
-Body: { dogId, imageUrl, username, action }
-Logic via lib/storage.ts appendAction(dogId, imageUrl, username, action):
-- If dogId already exists in swipes.json → push { username, action, timestamp } into its col array
-- If dogId does not exist → create new record { dogId, imageUrl, col: [{ username, action, timestamp }] }
+Body: { dogId, imageUrl, username, email, action }
+Logic via lib/storage.ts appendAction(dogId, imageUrl, username, email, action):
+- If dogId already exists in swipes.json → push { username, email, action, timestamp } into its col array
+- If dogId does not exist → create new record { dogId, imageUrl, col: [{ username, email, action, timestamp }] }
 
 ## Data Schema (swipes.json)
 Records are grouped by dog — one entry per dogId, multiple user actions in col array.
@@ -44,41 +45,52 @@ Records are grouped by dog — one entry per dogId, multiple user actions in col
     "dogId": "string",
     "imageUrl": "string",
     "col": [
-      { "username": "string", "action": "like" | "dislike", "timestamp": "ISO string" }
+      {
+        "username": "string",
+        "email": "string",
+        "action": "like" | "dislike",
+        "timestamp": "ISO string"
+      }
     ]
   }
 ]
 
-## Username Flow
-- On app load, if no username is stored in sessionStorage → redirect to /login page
-- /login page: simple form with username input (no password, no auth)
-- Username is saved to sessionStorage under key "username"
-- Username is sent in every POST /api/swipe request body
-- Username is displayed in the top navbar while swiping
+## Auth / Session Flow
+- Auth provider: NextAuth.js with Google provider
+- Required env vars: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXTAUTH_SECRET, NEXTAUTH_URL
+- On app load, if no NextAuth session → redirect to /login page
+- /login page: "Sign in with Google" button (official Google branding) — no username form
+- After Google OAuth: session.user.name = display name, session.user.email = email, session.user.image = avatar URL
+- username (session.user.name) is sent in every POST /api/swipe request body
+- email (session.user.email) is stored in col entries for reference
+- Navbar shows Google avatar + display name + sign out button (NextAuth signOut())
 
 ## File Structure
 /app
-  /page.tsx                — Redirect: if no username → /login, else → /swipe
-  /login/page.tsx          — Username entry form (required before anything)
-  /swipe/page.tsx          — Main swipe page (protected: requires username)
+  /page.tsx                — Redirect: if no session → /login, else → /swipe
+  /login/page.tsx          — Google Sign-In page (NextAuth signIn("google") CTA)
+  /swipe/page.tsx          — Main swipe page (protected: requires session)
   /history/page.tsx        — History page — shows all swipe records
   /api
+    /auth
+      /[...nextauth]
+        /route.ts          — NextAuth handler (GET + POST) with Google provider
     /dog/route.ts          — GET ?username=: serve unseen dog from storage, else fetch from random.dog
     /swipe/route.ts        — POST: appendAction upsert into swipes.json via lib/storage.ts
     /history/route.ts      — GET: read all swipe records from swipes.json
 /lib
-  /storage.ts              — findUnseenDog(username), appendAction(dogId, imageUrl, username, action)
+  /storage.ts              — findUnseenDog(username), appendAction(dogId, imageUrl, username, email, action)
 /data
   /swipes.json             — Persistent swipe storage (grouped by dog)
 /components
   /SwipeCard.tsx           — Dog card with swipe animation
   /SwipeButtons.tsx        — Like/Dislike buttons
-  /HistoryList.tsx         — List of dog records from swipes.json, shows col entries (username/action/timestamp) per dog
-  /Navbar.tsx              — Top bar showing current username + logout button
+  /HistoryList.tsx         — List of dog records from swipes.json, shows col entries (username/email/action/timestamp) per dog
+  /Navbar.tsx              — Top bar showing Google avatar + display name + sign out button
 
 ## Milestones
 1. API Layer — random.dog integration + swipes.json grouped schema + lib/storage.ts (findUnseenDog, appendAction)
-2. Login Page — username form + sessionStorage + redirect guard
+2. Login Page — NextAuth Google OAuth + session guard on /swipe
 3. Swipe UI — Card display + swipe interaction + GET /api/dog?username= unseen-first logic
 4. History Page — Display past swipe records with col array entries per dog
 5. Polish — Animations, empty states, error handling, skip .mp4 urls
@@ -87,12 +99,13 @@ Records are grouped by dog — one entry per dogId, multiple user actions in col
 - Using App Router (not Pages Router)
 - JSON file storage (no database needed for this prototype)
 - Swipe via buttons (optional: add drag gesture later)
-- No auth/password — username only for record-keeping purposes
-- Username stored in sessionStorage (clears on browser close)
+- Auth: NextAuth.js with Google provider — real identity, no custom username input
+- Username = session.user.name (Google display name), email = session.user.email (stored for reference)
 - Dog ID extracted from URL via split("/").pop() then remove extension
 - Skip .mp4 and non-image URLs from random.dog — fetch again automatically
 - data/swipes.json should be in .gitignore to avoid team conflicts
 - swipes.json grouped by dog (not per-swipe) — one record per dogId, col array holds all users' actions on that dog
+- col entries include email for future deduplication / multi-user queries
 - GET /api/dog?username= serves unseen dogs first — avoids redundant random.dog calls when storage has unseen dogs
 - lib/storage.ts owns all JSON read/write — routes call findUnseenDog/appendAction, never read fs directly
 
@@ -148,16 +161,18 @@ All design files carry a tailwind.config block — copy it into `tailwind.config
 - Top half: full-bleed hero dog image (`h-1/2 w-full object-cover`)
 - Bottom half: `bg-surface rounded-t-[32px] -mt-6` card overlapping image, shadow on top
 - Brand: "Pawnder" in `text-display text-primary` + tagline "Join the pack" in `text-on-surface-variant`
-- Input: `person` icon left, `rounded-xl bg-surface-container-low border-2 border-transparent focus:border-primary`
-- CTA: "Start Sniffing" + `arrow_forward` icon, `rounded-full bg-primary-container text-on-primary-container`
-- Note: design has email+password fields — our app is USERNAME ONLY (no password per project spec)
+- CTA: Replace Stitch username input + "Start Sniffing" button with a single "Sign in with Google" button
+  - Use official Google Sign-In button (white pill, Google logo + "Sign in with Google" text)
+  - onClick: call `signIn("google")` from next-auth/react
+  - Keep card layout, brand header, and hero image — only the form contents change
 
 ### Desktop (/design/pawnder_login_desktop/code.html)
 - Layout: `min-h-screen flex flex-row`
 - Left `md:w-3/5`: full-height dog photo with right-side gradient overlay fading to surface
-- Right `md:w-2/5`: centered login form, floating paw/heart/star icons as background decoration
+- Right `md:w-2/5`: centered login card, floating paw/heart/star icons as background decoration
 - Login card: `bg-surface rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-md border border-surface-container`
-- CTA: `bg-primary text-on-primary rounded-full` ("Start Sniffing")
+- CTA: Replace form with single "Sign in with Google" button (official Google branding, white pill)
+  - onClick: call `signIn("google")` from next-auth/react
 
 ## Phase 3 — Swipe UI Design Contract
 
@@ -202,4 +217,4 @@ All design files carry a tailwind.config block — copy it into `tailwind.config
 - No breed/name/age from random.dog — show dogId or omit label row in swipe card
 - Super Like button present in design — treat as like action (same POST /api/swipe with action:"like")
 - History cards adapt "Chat" button → shows like/dislike badge + timestamp instead
-- Username from sessionStorage shown in navbar, not an avatar/profile photo
+- Navbar shows Google avatar (session.user.image) + display name (session.user.name) + sign out button; not a plain username text label

@@ -9,7 +9,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { dogId, imageUrl, action, username } = body as Record<string, unknown>;
+  const { dogId, imageUrl, action, username, email } = body as Record<string, unknown>;
 
   if (!dogId || typeof dogId !== "string") {
     return NextResponse.json({ error: "Missing or invalid dogId" }, { status: 400 });
@@ -23,7 +23,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (!username || typeof username !== "string") {
     return NextResponse.json({ error: "Missing or invalid username" }, { status: 400 });
   }
+  if (!email || typeof email !== "string") {
+    return NextResponse.json({ error: "Missing or invalid email" }, { status: 400 });
+  }
 
-  const saved = await appendAction(dogId, imageUrl, username, action);
+  const saved = await appendAction(dogId, imageUrl, username, email, action);
   return NextResponse.json(saved);
 }

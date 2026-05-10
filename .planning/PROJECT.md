@@ -17,22 +17,22 @@ A user can log in, swipe on dogs, and have their swipes saved — the loop must 
 ### Validated (v0.1)
 
 - App fetches random dog image from random.dog, skips .mp4 URLs ✓ (Phase 1)
-- Swipe records saved to /data/swipes.json grouped by dog: `{dogId, imageUrl, col: [{username, action, timestamp}]}` ✓ (Phase 1)
+- Swipe records saved to /data/swipes.json grouped by dog: `{dogId, imageUrl, col: [{username, email, action, timestamp}]}` ✓ (Phase 1 schema; email field added in Phase 2 scope)
 - History readable from /data/swipes.json ✓ (Phase 1)
 
 ### Active
 
-- [ ] User can enter a username on /login and be redirected to the swipe page
-- [ ] Username is stored in sessionStorage and required before accessing /swipe
+- [ ] User signs in with Google (NextAuth) on /login and is redirected to /swipe
+- [ ] Active NextAuth session required before accessing /swipe; no session → redirect to /login
 - [ ] GET /api/dog?username= serves an unseen dog from storage first; falls back to random.dog only when none available (skips .mp4 URLs)
 - [ ] User can swipe right (like) or left (dislike) on a dog image
-- [ ] Each swipe appends `{username, action, timestamp}` to the dog's `col` array in /data/swipes.json via lib/storage.ts appendAction
-- [ ] Username is visible in the navbar while swiping
+- [ ] Each swipe appends `{username, email, action, timestamp}` to the dog's `col` array in /data/swipes.json via lib/storage.ts appendAction
+- [ ] Google avatar + display name visible in the navbar while swiping
 
 ### Out of Scope
 
 - History page — deferred to v2 (core loop first, history is nice-to-have)
-- Authentication / passwords — username only, no auth needed for workshop scope
+- Custom username/password auth — Google OAuth via NextAuth covers identity needs
 - Drag gesture swiping — buttons only for now; gestures are optional polish
 - Database — JSON file storage is sufficient for this prototype
 - .mp4 handling UI — skip silently and re-fetch, no user-facing error needed
@@ -57,7 +57,7 @@ Example: "https://random.dog/d40de385-3626-46c8-94bf-b7097226174f.jpg" → "d40d
 |----------|-----------|---------|
 | App Router (not Pages Router) | Workshop uses latest Next.js patterns | ✅ Validated (Phase 1) |
 | JSON file storage | No DB setup overhead for prototype | ✅ Validated (Phase 1) |
-| sessionStorage for username | Clears on browser close, simple to implement | ⏳ Pending (Phase 2) |
+| NextAuth.js + Google OAuth for identity | Real identity, no custom auth UI, session managed by NextAuth | ⏳ Pending (Phase 2) |
 | Buttons for swipe (not drag) | Simpler to build, drag optional later | ⏳ Pending (Phase 3) |
 | Skip .mp4 URLs silently | random.dog returns video sometimes; re-fetch is cleaner UX | ✅ Validated (Phase 1) |
 | data/swipes.json in .gitignore | Avoid team conflicts on shared swipe data | ✅ Validated (Phase 1) |

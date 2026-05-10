@@ -6,6 +6,7 @@ const SWIPES_FILE = path.join(DATA_DIR, "swipes.json");
 
 export interface SwipeAction {
   username: string;
+  email: string;
   action: "like" | "dislike";
   timestamp: string;
 }
@@ -40,11 +41,12 @@ export async function appendAction(
   dogId: string,
   imageUrl: string,
   username: string,
+  email: string,
   action: "like" | "dislike"
 ): Promise<DogRecord> {
   await ensureStore();
   const dogs = await readDogs();
-  const entry: SwipeAction = { username, action, timestamp: new Date().toISOString() };
+  const entry: SwipeAction = { username, email, action, timestamp: new Date().toISOString() };
   const existing = dogs.find((d) => d.dogId === dogId);
   if (existing) {
     existing.col.push(entry);

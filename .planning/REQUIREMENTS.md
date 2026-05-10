@@ -12,15 +12,15 @@
 
 ### Swipe Storage
 
-- [x] **SWIPE-01**: POST /api/swipe upserts `/data/swipes.json` — finds existing record by `dogId` or creates one (`{dogId, imageUrl, col: []}`), then appends `{username, action, timestamp}` to its `col` array
+- [x] **SWIPE-01**: POST /api/swipe upserts `/data/swipes.json` — finds existing record by `dogId` or creates one (`{dogId, imageUrl, col: []}`), then appends `{username, email, action, timestamp}` to its `col` array
 - [x] **SWIPE-02**: GET /api/swipe (or /api/history) reads all records from `/data/swipes.json`
-- [ ] **SWIPE-03**: `lib/storage.ts` exposes `findUnseenDog(username)` (returns first dog record where username absent from col, or null) and `appendAction(dogId, imageUrl, username, action)` (upsert); all API routes use these functions instead of reading fs directly
+- [ ] **SWIPE-03**: `lib/storage.ts` exposes `findUnseenDog(username)` (returns first dog record where username absent from col, or null) and `appendAction(dogId, imageUrl, username, email, action)` (upsert with email in col entry); all API routes use these functions instead of reading fs directly
 
 ### Login / Identity
 
-- [ ] **LOGIN-01**: User can enter a username on `/login` page and submit
-- [ ] **LOGIN-02**: Username is saved to sessionStorage under the key "username" on submit
-- [ ] **LOGIN-03**: Visiting `/swipe` without a username in sessionStorage redirects to `/login`
+- [ ] **LOGIN-01**: `/login` page shows "Sign in with Google" button; clicking it initiates NextAuth Google OAuth flow
+- [ ] **LOGIN-02**: After Google OAuth, NextAuth session is established with `session.user.name`, `session.user.email`, `session.user.image`; env vars `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL` required
+- [ ] **LOGIN-03**: Visiting `/swipe` or `/history` without an active NextAuth session redirects to `/login`
 
 ### Swipe UI
 
@@ -28,27 +28,27 @@
 - [ ] **UI-02**: User can click Like or Dislike buttons on the swipe page
 - [ ] **UI-03**: Each button click sends a POST /api/swipe with the correct action and username
 - [ ] **UI-04**: Next dog image loads automatically after each swipe
-- [ ] **UI-05**: Navbar displays the current username while on the swipe page
+- [ ] **UI-05**: Navbar displays Google avatar + display name while on the swipe page
 
 ## v2 Requirements
 
 ### History
 
 - **HIST-01**: User can view all past swipe records on a `/history` page
-- **HIST-02**: History page shows each dog record's dogId, imageUrl thumbnail, and all swipes from its `col` array (username, action, timestamp per entry)
+- **HIST-02**: History page shows each dog record's dogId, imageUrl thumbnail, and all swipes from its `col` array (username, email, action, timestamp per entry)
 
 ### Polish
 
 - **POLISH-01**: Swipe card animates off-screen on like/dislike
 - **POLISH-02**: Empty state shown when no swipes have been recorded
 - **POLISH-03**: Error state shown when random.dog API is unreachable
-- **POLISH-04**: Logout button in navbar clears sessionStorage and redirects to /login
+- **POLISH-04**: Sign out button in navbar calls NextAuth `signOut()` and redirects to /login
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Authentication / passwords | Username only for record-keeping — no auth needed |
+| Custom username/password auth | Google OAuth via NextAuth covers identity; no password system needed |
 | Database | JSON file sufficient for workshop prototype |
 | Drag gesture swiping | Buttons only; gestures are optional polish not in v1 |
 | History page (v1) | Core loop first; history is v2 |
@@ -79,4 +79,4 @@
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after initial definition*
+*Last updated: 2026-05-08 — Google OAuth swap (NextAuth), email added to col entries*
