@@ -9,7 +9,7 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 ## Current Position
 
-Phase: 2 of 3 (Login Page)
+Phase: 2 of 4 (Login Page)
 Plan: 2 of 2 in current phase
 Status: Phase 2 complete — 02-01 and 02-02 both verified
 Last activity: 2026-05-10 — 02-02 verified (NextAuth v5 config, OAuth route, login page, root redirect, swipe auth-guard)
@@ -50,6 +50,10 @@ Recent decisions affecting current work:
 - Project init: Skip .mp4 URLs silently — re-fetch is cleaner UX
 - 02-02 verified: CLIENT_ID/CLIENT_SECRET naming (not GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET) confirmed correct per D-01 NextAuth v5 convention
 
+### Roadmap Evolution
+
+- Phase 4 added: History Page — swipe records grouped by username, summary bar, action filter, timestamp sort
+
 ### Pending Todos
 
 None.
@@ -62,7 +66,6 @@ None.
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| v2 | History page (HIST-01, HIST-02) | Deferred | Init |
 | v2 | Swipe card animations (POLISH-01) | Deferred | Init |
 | v2 | Empty state UI (POLISH-02) | Deferred | Init |
 | v2 | API error state UI (POLISH-03) | Deferred | Init |

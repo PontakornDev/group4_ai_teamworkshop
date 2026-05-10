@@ -22,6 +22,7 @@ Three vertical slices deliver the full core loop: API routes first (the data lay
 
 - [x] **Phase 2: Login Page** - Users sign in with Google (NextAuth) and the app guards /swipe access
 - [ ] **Phase 3: Swipe UI** - Users can swipe on dogs with full like/dislike flow and persistence
+- [ ] **Phase 4: History Page** - Show all like/dislike records grouped by username with summary bar, filters, and sort
 
 ## Phase Details
 
@@ -55,6 +56,20 @@ Plans:
 **Plans**: TBD
 **UI hint**: yes
 
+### Phase 4: History Page
+**Goal**: Users can view all swipe records grouped by username — with a summary bar showing total likes/dislikes per user, action filter (all/like/dislike), and timestamp sort
+**Mode:** mvp
+**Depends on**: Phase 3
+**Requirements**: HIST-01, HIST-02, HIST-03, HIST-04
+**Success Criteria** (what must be TRUE):
+  1. /history page lists all swipe records from swipes.json, grouped by username
+  2. Summary bar at top shows total likes count and total dislikes count per user
+  3. User can filter records by action: all / like / dislike
+  4. Records are sortable by timestamp (newest first by default)
+  5. UI matches Stitch design export for history page (mobile + desktop layouts)
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -62,3 +77,4 @@ Plans:
 | 1. API Layer | 1/1 | ✅ Complete | 2026-05-08 |
 | 2. Login Page | 2/2 | ✅ Complete | 2026-05-10 |
 | 3. Swipe UI | 0/? | Not started | - |
+| 4. History Page | 0/? | Not started | - |
