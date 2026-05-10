@@ -14,7 +14,7 @@ export default async function SwipePage() {
       <div className="md:ml-64 flex flex-col h-full">
         {/* Mobile header */}
         <header className="md:hidden w-full pt-sm pb-xs px-container-padding flex justify-center items-center flex-shrink-0 z-10">
-          <h1 className="font-display text-headline-lg text-primary tracking-tight">Pawnder</h1>
+          <h1 className="font-display text-headline-lg text-primary tracking-tight">Dogs Tinder</h1>
         </header>
 
         <SwipeClient

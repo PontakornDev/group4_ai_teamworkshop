@@ -38,7 +38,7 @@ Three vertical slices deliver the full core loop: API routes first (the data lay
 **Plans**: 2 plans
 
 Plans:
-- [x] 02-01-PLAN.md — Replace globals.css (@theme design tokens) and layout.tsx (Quicksand font + Pawnder metadata + SessionProvider)
+- [x] 02-01-PLAN.md — Replace globals.css (@theme design tokens) and layout.tsx (Quicksand font + Dogs Tinder metadata + SessionProvider)
 - [x] 02-02-PLAN.md — NextAuth route handler, login page (Google Sign-In), swipe auth-guard stub, root redirect
 
 ### Phase 3: Swipe UI

@@ -18,7 +18,7 @@ export default function Navbar() {
             <span className="material-symbols-outlined fill" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
           </div>
           <div>
-            <h1 className="font-display text-headline-lg text-primary">Pawnder</h1>
+            <h1 className="font-display text-headline-lg text-primary">Dogs Tinder</h1>
             <p className="font-label-sm text-label-sm text-on-surface-variant">Adoption Portal</p>
           </div>
         </div>

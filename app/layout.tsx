@@ -3,7 +3,7 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
-  title: "Pawnder",
+  title: "Dogs Tinder",
   description: "Find your perfect dog match",
 };
 

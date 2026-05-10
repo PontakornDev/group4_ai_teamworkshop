@@ -79,7 +79,7 @@ All 5 acceptance criteria passed without modification:
 | Check | Criterion | Result |
 |-------|-----------|--------|
 | 1 | `import { SessionProvider } from "next-auth/react"` present | PASS (line 3) |
-| 2 | `export const metadata` has `title: "Pawnder"` | PASS (line 6) |
+| 2 | `export const metadata` has `title: "Dogs Tinder"` | PASS (line 6) |
 | 3 | `export const metadata` has description field | PASS (line 7) |
 | 4 | `{children}` wrapped inside `<SessionProvider>` | PASS (line 16: `<SessionProvider>{children}</SessionProvider>`) |
 | 5 | `<body>` has `font-sans` class | PASS (line 15) |

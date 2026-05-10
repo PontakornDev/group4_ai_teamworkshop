@@ -18,7 +18,7 @@ export default async function HistoryPage() {
         {/* Mobile header */}
         <header className="md:hidden bg-surface shadow-sm sticky top-0 z-40">
           <div className="flex justify-between items-center px-container-padding h-16">
-            <div className="font-display text-headline-md text-primary">Pawnder</div>
+            <div className="font-display text-headline-md text-primary">Dogs Tinder</div>
           </div>
         </header>
 

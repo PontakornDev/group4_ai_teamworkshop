@@ -118,7 +118,7 @@ Records are grouped by dog — one entry per dogId, multiple user actions in col
 ## Design System (extracted from /design/friendly_pet_discovery/DESIGN.md)
 
 ### Brand
-- Name: Pawnder (displayed as "Pawnder" in UI, not "Dog Tinder")
+- Name: Dogs Tinder (displayed as "Dogs Tinder" in UI)
 - Personality: energetic, heartwarming, approachable — "Tactile-Modern"
 
 ### Tokens
@@ -160,7 +160,7 @@ All design files carry a tailwind.config block — copy it into `tailwind.config
 - Layout: `h-screen flex flex-col overflow-hidden`
 - Top half: full-bleed hero dog image (`h-1/2 w-full object-cover`)
 - Bottom half: `bg-surface rounded-t-[32px] -mt-6` card overlapping image, shadow on top
-- Brand: "Pawnder" in `text-display text-primary` + tagline "Join the pack" in `text-on-surface-variant`
+- Brand: "Dogs Tinder" in `text-display text-primary` + tagline "Join the pack" in `text-on-surface-variant`
 - CTA: Replace Stitch username input + "Start Sniffing" button with a single "Sign in with Google" button
   - Use official Google Sign-In button (white pill, Google logo + "Sign in with Google" text)
   - onClick: call `signIn("google")` from next-auth/react
@@ -177,7 +177,7 @@ All design files carry a tailwind.config block — copy it into `tailwind.config
 ## Phase 3 — Swipe UI Design Contract
 
 ### Mobile (/design/pawnder_swipe_mobile/code.html)
-- Header: minimal centered "Pawnder" in `text-headline-lg text-primary`
+- Header: minimal centered "Dogs Tinder" in `text-headline-lg text-primary`
 - Card: `absolute` fills `top-0 left-container-padding right-container-padding bottom-[120px]`, `rounded-3xl shadow`, overflow hidden
   - Image fills top, gradient scrim at bottom for text readability
   - Overlay text bottom-left: dog name/age (we show dogId or skip label)
