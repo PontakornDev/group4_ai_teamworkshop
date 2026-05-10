@@ -19,7 +19,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   if (username) {
     const unseen = await findUnseenDog(username);
     if (unseen) {
-      return NextResponse.json({ url: unseen.imageUrl, dogId: unseen.dogId });
+      return NextResponse.json({ imageUrl: unseen.imageUrl, dogId: unseen.dogId });
     }
   }
 
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const data = (await res.json()) as { fileSizeBytes: number; url: string };
 
     if (isImageUrl(data.url)) {
-      return NextResponse.json({ url: data.url, dogId: extractDogId(data.url) });
+      return NextResponse.json({ imageUrl: data.url, dogId: extractDogId(data.url) });
     }
   }
 
