@@ -20,7 +20,7 @@ Three vertical slices deliver the full core loop: API routes first (the data lay
 
 ## 🚧 v1.0 — Full Core Loop (IN PROGRESS)
 
-- [ ] **Phase 2: Login Page** - Users sign in with Google (NextAuth) and the app guards /swipe access
+- [x] **Phase 2: Login Page** - Users sign in with Google (NextAuth) and the app guards /swipe access
 - [ ] **Phase 3: Swipe UI** - Users can swipe on dogs with full like/dislike flow and persistence
 
 ## Phase Details
@@ -38,8 +38,8 @@ Three vertical slices deliver the full core loop: API routes first (the data lay
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Replace globals.css (@theme design tokens) and layout.tsx (Quicksand font + Pawnder metadata + SessionProvider)
-- [ ] 02-02-PLAN.md — NextAuth route handler, login page (Google Sign-In), swipe auth-guard stub, root redirect
+- [x] 02-01-PLAN.md — Replace globals.css (@theme design tokens) and layout.tsx (Quicksand font + Pawnder metadata + SessionProvider)
+- [x] 02-02-PLAN.md — NextAuth route handler, login page (Google Sign-In), swipe auth-guard stub, root redirect
 
 ### Phase 3: Swipe UI
 **Goal**: Users can see dog images and swipe like or dislike — each action is saved and the next dog loads
@@ -60,5 +60,5 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. API Layer | 1/1 | ✅ Complete | 2026-05-08 |
-| 2. Login Page | 0/2 | Ready to execute | - |
+| 2. Login Page | 2/2 | ✅ Complete | 2026-05-10 |
 | 3. Swipe UI | 0/? | Not started | - |
