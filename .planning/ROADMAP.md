@@ -20,26 +20,26 @@ Three vertical slices deliver the full core loop: API routes first (the data lay
 
 ## 🚧 v1.0 — Full Core Loop (IN PROGRESS)
 
-- [ ] **Phase 2: Login Page** - Users can enter a username and the app guards /swipe access
+- [ ] **Phase 2: Login Page** - Users sign in with Google (NextAuth) and the app guards /swipe access
 - [ ] **Phase 3: Swipe UI** - Users can swipe on dogs with full like/dislike flow and persistence
 
 ## Phase Details
 
 ### Phase 2: Login Page
-**Goal**: Users can identify themselves with a username and the app prevents access to /swipe without one
+**Goal**: Users sign in with Google via NextAuth and the app prevents access to /swipe without an active session
 **Mode:** mvp
 **Depends on**: Phase 1
 **Requirements**: LOGIN-01, LOGIN-02, LOGIN-03
 **Success Criteria** (what must be TRUE):
-  1. User can visit /login, type a username, and submit the form
-  2. After submitting, the username is stored in sessionStorage under the key "username"
-  3. User is redirected to /swipe after successful login
-  4. Visiting /swipe without a username in sessionStorage redirects back to /login
+  1. User can visit /login and see a "Sign in with Google" button with official Google branding
+  2. After Google OAuth completes, NextAuth session exists with user.name, user.email, user.image
+  3. User is redirected to /swipe after successful sign-in
+  4. Visiting /swipe without an active NextAuth session redirects back to /login
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Replace globals.css (@theme design tokens) and layout.tsx (Quicksand font + Pawnder metadata)
-- [ ] 02-02-PLAN.md — Build login page, swipe auth-guard stub, root redirect + UAT checkpoint
+- [ ] 02-01-PLAN.md — Replace globals.css (@theme design tokens) and layout.tsx (Quicksand font + Pawnder metadata + SessionProvider)
+- [ ] 02-02-PLAN.md — NextAuth route handler, login page (Google Sign-In), swipe auth-guard stub, root redirect
 
 ### Phase 3: Swipe UI
 **Goal**: Users can see dog images and swipe like or dislike — each action is saved and the next dog loads
@@ -49,9 +49,9 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. /swipe page shows a dog image in a card layout
   2. User can click Like or Dislike buttons on the card
-  3. Each button click sends a POST to /api/swipe with the correct action, dogId, imageUrl, username, and timestamp
+  3. Each button click sends a POST to /api/swipe with the correct action, dogId, imageUrl, username (session.user.name), and email (session.user.email)
   4. After each swipe, the next dog image loads automatically in the card
-  5. The navbar displays the current username while on the swipe page
+  5. The navbar displays Google avatar (session.user.image) + display name while on the swipe page
 **Plans**: TBD
 **UI hint**: yes
 
@@ -60,5 +60,5 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. API Layer | 1/1 | ✅ Complete | 2026-05-08 |
-| 2. Login Page | 0/2 | Not started | - |
+| 2. Login Page | 0/? | Not started — re-plan needed (OAuth scope change) | - |
 | 3. Swipe UI | 0/? | Not started | - |
