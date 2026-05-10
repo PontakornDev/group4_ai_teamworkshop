@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 ## Current Position
 
-Phase: 1 of 3 (API Layer)
-Plan: 1 of 1 in current phase
-Status: Phase 1 complete — ready for Phase 2
-Last activity: 2026-05-07 — Phase 1 plan 01 executed (3 tasks, 15 tests passing)
+Phase: 2 of 3 (Login Page)
+Plan: 0 of 2 in current phase
+Status: Phase 2 planned — ready to execute (2 verification plans, wave 1)
+Last activity: 2026-05-10 — Phase 2 planned (02-01, 02-02 created; verifies existing NextAuth implementation)
 
 Progress: [███░░░░░░░] 33%
 
@@ -44,7 +44,7 @@ Recent decisions affecting current work:
 
 - Project init: App Router (not Pages Router) — workshop uses latest Next.js patterns
 - Project init: JSON file storage at /data/swipes.json — no DB overhead for prototype
-- Project init: sessionStorage for username — clears on browser close, simple
+- Phase 2 scope change: NextAuth.js + Google OAuth for identity (replaces sessionStorage username approach)
 - Project init: Buttons for swipe (not drag) — simpler to build
 - Project init: Skip .mp4 URLs silently — re-fetch is cleaner UX
 
@@ -68,6 +68,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-07
-Stopped at: Phase 1 complete — 01-01-PLAN.md executed (15 tests passing)
-Resume file: .planning/phases/02-login-page/ (next phase)
+Last session: 2026-05-10
+Stopped at: Phase 2 planned — 02-01 + 02-02 verification plans ready
+Resume file: .planning/phases/02-login-page/ — run /gsd-execute-phase 2

@@ -60,5 +60,5 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. API Layer | 1/1 | ✅ Complete | 2026-05-08 |
-| 2. Login Page | 0/? | Not started — re-plan needed (OAuth scope change) | - |
+| 2. Login Page | 0/2 | Ready to execute | - |
 | 3. Swipe UI | 0/? | Not started | - |
