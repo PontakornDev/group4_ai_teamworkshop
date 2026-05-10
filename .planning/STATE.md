@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 2 of 3 (Login Page)
-Plan: 1 of 2 in current phase
-Status: Phase 2 executing — 02-01 complete, 02-02 pending
-Last activity: 2026-05-10 — 02-01 verified (globals.css design tokens + layout.tsx SessionProvider)
+Plan: 2 of 2 in current phase
+Status: Phase 2 complete — 02-01 and 02-02 both verified
+Last activity: 2026-05-10 — 02-02 verified (NextAuth v5 config, OAuth route, login page, root redirect, swipe auth-guard)
 
-Progress: [████░░░░░░] 40%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: ~8 min
-- Total execution time: ~8 min
+- Total plans completed: 2
+- Average duration: ~5 min
+- Total execution time: ~10 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-api-layer | 1 | ~8 min | ~8 min |
-| 02-login-page | 1 | ~2 min | ~2 min |
+| 02-login-page | 2 | ~3 min | ~1.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~8 min)
-- Trend: -
+- Last 5 plans: 01-01 (~8 min), 02-01 (~2 min), 02-02 (~1 min)
+- Trend: verification plans faster than feature plans
 
 *Updated after each plan completion*
 
@@ -48,6 +48,7 @@ Recent decisions affecting current work:
 - Phase 2 scope change: NextAuth.js + Google OAuth for identity (replaces sessionStorage username approach)
 - Project init: Buttons for swipe (not drag) — simpler to build
 - Project init: Skip .mp4 URLs silently — re-fetch is cleaner UX
+- 02-02 verified: CLIENT_ID/CLIENT_SECRET naming (not GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET) confirmed correct per D-01 NextAuth v5 convention
 
 ### Pending Todos
 
@@ -70,5 +71,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-10
-Stopped at: Phase 2, Plan 01 complete — 02-02 (login page UI) is next
-Resume file: .planning/phases/02-login-page/02-02-PLAN.md
+Stopped at: Phase 2 complete — both 02-01 and 02-02 verified
+Resume file: None (Phase 2 complete, proceed to Phase 3)
