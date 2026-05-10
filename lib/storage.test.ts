@@ -50,7 +50,7 @@ describe("readDogs", () => {
 describe("appendAction", () => {
   it("creates new dog record when dogId does not exist", async () => {
     const { appendAction, readDogs } = await getStorage();
-    const result = await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
+    const result = await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "alice@example.com", "like");
     expect(result.dogId).toBe("dog1");
     expect(result.imageUrl).toBe("https://example.com/dog1.jpg");
     expect(result.col).toHaveLength(1);
@@ -63,8 +63,8 @@ describe("appendAction", () => {
 
   it("appends to col when dogId already exists", async () => {
     const { appendAction, readDogs } = await getStorage();
-    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
-    await appendAction("dog1", "https://example.com/dog1.jpg", "bob", "dislike");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "alice@example.com", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "bob", "bob@example.com", "dislike");
     const all = await readDogs();
     expect(all).toHaveLength(1);
     expect(all[0].col).toHaveLength(2);
@@ -74,8 +74,8 @@ describe("appendAction", () => {
 
   it("two different dogs produce two records", async () => {
     const { appendAction, readDogs } = await getStorage();
-    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
-    await appendAction("dog2", "https://example.com/dog2.jpg", "alice", "dislike");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "alice@example.com", "like");
+    await appendAction("dog2", "https://example.com/dog2.jpg", "alice", "alice@example.com", "dislike");
     const all = await readDogs();
     expect(all).toHaveLength(2);
   });
@@ -90,7 +90,7 @@ describe("findUnseenDog", () => {
 
   it("returns dog record that username has not swiped on", async () => {
     const { appendAction, findUnseenDog } = await getStorage();
-    await appendAction("dog1", "https://example.com/dog1.jpg", "bob", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "bob", "bob@example.com", "like");
     const result = await findUnseenDog("alice");
     expect(result).not.toBeNull();
     expect(result!.dogId).toBe("dog1");
@@ -98,15 +98,15 @@ describe("findUnseenDog", () => {
 
   it("returns null when all dogs already swiped by username", async () => {
     const { appendAction, findUnseenDog } = await getStorage();
-    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "alice@example.com", "like");
     const result = await findUnseenDog("alice");
     expect(result).toBeNull();
   });
 
   it("skips swiped dogs and returns unseen one", async () => {
     const { appendAction, findUnseenDog } = await getStorage();
-    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "like");
-    await appendAction("dog2", "https://example.com/dog2.jpg", "bob", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "alice@example.com", "like");
+    await appendAction("dog2", "https://example.com/dog2.jpg", "bob", "bob@example.com", "like");
     const result = await findUnseenDog("alice");
     expect(result!.dogId).toBe("dog2");
   });
