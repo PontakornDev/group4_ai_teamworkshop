@@ -36,6 +36,15 @@
 
 - **HIST-01**: User can view all past swipe records on a `/history` page
 - **HIST-02**: History page shows each dog record's dogId, imageUrl thumbnail, and all swipes from its `col` array (username, email, action, timestamp per entry)
+- **HIST-03**: History records are filterable by action (all / like / dislike)
+- **HIST-04**: History records are sortable by timestamp (newest first by default)
+
+### Top Dogs (Most Popular)
+
+- **TOP-01**: `lib/storage.ts` exposes `getTopDogs()` — reads swipes.json, counts likes and dislikes per dogId across all col entries, returns `{ mostLiked: { dogId, imageUrl, likeCount }, mostDisliked: { dogId, imageUrl, dislikeCount } }`; returns null for a category if no matching actions exist
+- **TOP-02**: GET `/api/stats` returns the `getTopDogs()` result as JSON — `{ mostLiked: { dogId, imageUrl, likeCount }, mostDisliked: { dogId, imageUrl, dislikeCount } }`
+- **TOP-03**: `/history` page renders a "Top Dogs" summary section above the record list — two highlight cards (Most Liked, Most Disliked) each showing dog image, dogId, and count
+- **TOP-04**: Top Dogs cards follow the Stitch design system (Quicksand font, `#9b4500` primary, `rounded-[24px]`, shadow `0_4px_24px_rgba(0,0,0,0.04)`)
 
 ### Polish
 
@@ -71,12 +80,19 @@
 | UI-03 | Phase 3 | Pending |
 | UI-04 | Phase 3 | Pending |
 | UI-05 | Phase 3 | Pending |
+| HIST-03 | Phase 4 | Pending |
+| HIST-04 | Phase 4 | Pending |
+| TOP-01 | Phase 5 | Pending |
+| TOP-02 | Phase 5 | Pending |
+| TOP-03 | Phase 5 | Pending |
+| TOP-04 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 13 total
-- Mapped to phases: 13
+- v2 requirements: 8 total (HIST-01–04, TOP-01–04)
+- Mapped to phases: 21
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 — Google OAuth swap (NextAuth), email added to col entries*
+*Last updated: 2026-05-10 — Top Dogs feature (Phase 5) added; HIST-03/04 promoted from implicit to explicit*

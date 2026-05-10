@@ -23,6 +23,7 @@ Three vertical slices deliver the full core loop: API routes first (the data lay
 - [x] **Phase 2: Login Page** - Users sign in with Google (NextAuth) and the app guards /swipe access
 - [ ] **Phase 3: Swipe UI** - Users can swipe on dogs with full like/dislike flow and persistence
 - [ ] **Phase 4: History Page** - Show all like/dislike records grouped by username with summary bar, filters, and sort
+- [ ] **Phase 5: Top Dogs** - Most liked and most disliked dog highlight cards at the top of the history page, backed by `getTopDogs()` and GET `/api/stats`
 
 ## Phase Details
 
@@ -70,6 +71,20 @@ Plans:
 **Plans**: TBD
 **UI hint**: yes
 
+### Phase 5: Top Dogs
+**Goal**: Show the most liked and most disliked dogs as highlight cards at the top of the history page
+**Mode:** mvp
+**Depends on**: Phase 4
+**Requirements**: TOP-01, TOP-02, TOP-03, TOP-04
+**Success Criteria** (what must be TRUE):
+  1. `getTopDogs()` in lib/storage.ts correctly aggregates col entries by action across all dog records
+  2. GET `/api/stats` returns `{ mostLiked: { dogId, imageUrl, likeCount }, mostDisliked: { dogId, imageUrl, dislikeCount } }`
+  3. `/history` page shows two highlight cards above the record list when data exists
+  4. Cards display dog image thumbnail, dogId label, and numeric count (e.g. "12 likes")
+  5. Cards match design system: Quicksand font, `#9b4500` primary, 24px border radius, design system shadow
+  6. Empty state: no cards shown (or placeholder) when swipes.json is empty
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -78,3 +93,4 @@ Plans:
 | 2. Login Page | 2/2 | ✅ Complete | 2026-05-10 |
 | 3. Swipe UI | 0/? | Not started | - |
 | 4. History Page | 0/? | Not started | - |
+| 5. Top Dogs | 0/? | Not started | - |
