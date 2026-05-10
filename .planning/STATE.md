@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** A user can log in, swipe on dogs, and have their swipes saved — the loop must work end to end.
-**Current focus:** Phase 2 — Login Page
+**Current focus:** Phase 3 — Swipe UI
 
 ## Current Position
 
-Phase: 2 of 4 (Login Page)
-Plan: 2 of 2 in current phase
-Status: Phase 2 complete — 02-01 and 02-02 both verified
-Last activity: 2026-05-10 — 02-02 verified (NextAuth v5 config, OAuth route, login page, root redirect, swipe auth-guard)
+Phase: 3 of 5 (Swipe UI)
+Plan: 0 of 2 in current phase
+Status: Phase 3 planned — ready to execute (2 plans: bug fix + E2E verification)
+Last activity: 2026-05-10 — Phase 3 plans created (03-01: url→imageUrl fix, 03-02: E2E verification)
 
 Progress: [█████░░░░░] 50%
 
