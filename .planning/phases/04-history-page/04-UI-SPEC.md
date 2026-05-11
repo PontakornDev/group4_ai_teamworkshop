@@ -1,7 +1,8 @@
 ---
 phase: 4
 slug: history-page
-status: draft
+status: approved
+reviewed_at: 2026-05-11T19:20:00+07:00
 shadcn_initialized: false
 preset: none
 created: 2026-05-11
