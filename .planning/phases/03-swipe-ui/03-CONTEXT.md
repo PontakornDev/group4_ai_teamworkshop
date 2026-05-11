@@ -1,12 +1,12 @@
 # Phase 3: Swipe UI - Context
 
-**Gathered:** 2026-05-10
-**Status:** Implementation largely complete — fix one bug + verify end-to-end
+**Gathered:** 2026-05-11 (updated — code review fixes)
+**Status:** Implementation complete — code review fixes decided
 
 <domain>
 ## Phase Boundary
 
-Users can see dog images in a card and swipe like or dislike — each action is saved and the next dog loads. Phase 3 code already exists in the codebase. Work here is: fix one API field name bug, then verify the full swipe flow end-to-end.
+Users can see dog images in a card and swipe like or dislike — each action is saved and the next dog loads. Phase 3 code is complete and verified end-to-end. Remaining work: fix three critical issues and one warning found in the Phase 3 code review (`app/api/dog/route.ts` + `lib/storage.ts`).
 
 **Phase 3 implementation status:**
 - `app/swipe/page.tsx` — auth guard + session pass-through ✅
@@ -14,8 +14,8 @@ Users can see dog images in a card and swipe like or dislike — each action is 
 - `components/SwipeCard.tsx` — card with image, gradient scrim, tag overlay ✅
 - `components/SwipeButtons.tsx` — dislike/superlike/like FABs ✅
 - `components/Navbar.tsx` — Google avatar + display name + sign out ✅
-- `lib/storage.ts` — findUnseenDog + appendAction (SWIPE-03 done) ✅
-- `app/api/dog/route.ts` — unseen-first logic + .mp4 retry ✅ (bug: returns `url` not `imageUrl`)
+- `lib/storage.ts` — findUnseenDog + appendAction ✅ (needs hasUserSeenDog)
+- `app/api/dog/route.ts` — unseen-first logic + .mp4 retry ✅ (needs auth + res.ok + seen check + dogId guard)
 - `app/api/swipe/route.ts` — appendAction upsert ✅
 
 </domain>
@@ -23,23 +23,29 @@ Users can see dog images in a card and swipe like or dislike — each action is 
 <decisions>
 ## Implementation Decisions
 
-### Bug Fix
-- **D-01:** Fix is in the API — `/api/dog/route.ts` must return `{ imageUrl, dogId }` (not `{ url, dogId }`). The client `DogData` interface, `SwipeCard`, and swipe POST body all use `imageUrl` — the API was the outlier. This is the only code change needed.
+### Original Decisions (Phase 3 execution)
+- **D-01:** Fix `url → imageUrl` in `/api/dog/route.ts`. ✅ Applied.
+- **D-02:** Existing layout close enough — no redesign. Mobile bottom-nav and desktop sidebar match Stitch swipe pattern.
+- **D-03:** "No more dogs!" + try-again button covers empty state and API error for MVP.
+- **D-04:** Verify-only phase. Code exists. Bug fix + E2E verification. ✅ Complete.
+- **D-05:** SuperLike maps to "like" action — already implemented.
+- **D-06:** `lib/storage.ts` exposes `findUnseenDog` and `appendAction`. SWIPE-03 complete.
 
-### Design Fidelity
-- **D-02:** Existing layout is close enough — no redesign. Mobile bottom-nav and desktop sidebar already match the Stitch swipe pattern. Card/button sizing follows design tokens (rounded-3xl, primary FAB, outline-variant dislike ring). Do not rebuild UI from scratch.
+### Auth on /api/dog (CR-01)
+- **D-07:** `/api/dog` must verify the NextAuth session before serving a dog — return 401 if no session.
+- **D-08:** Use `auth()` from `@/auth` (NextAuth v5). This is the only option — `authOptions` is not exported anywhere; `getServerSession` is v4 and won't work.
+- **D-09:** `session.user.name` is the authoritative username. Drop the `username` query param from route logic entirely.
 
-### Error & Loading States
-- **D-03:** "No more dogs!" + try-again button covers both empty state and API error for MVP. POLISH-03 (distinct error UI) stays deferred to v2.
+### HTTP Error Handling (CR-02)
+- **D-10:** Check `res.ok` before `res.json()` in the fetch loop. `if (!res.ok) continue` — skips the attempt, prevents TypeError crash on random.dog 4xx/5xx.
 
-### Phase Approach
-- **D-04:** Verify-only phase (same as Phase 2). Code exists. Plan = fix the url→imageUrl bug, then run end-to-end verification (fetch dog → swipe → confirm swipes.json updated → next dog loads).
+### Freshly-Fetched Dog Seen Check (CR-03)
+- **D-11:** After fetching from random.dog, verify the dog hasn't been seen by this user before returning. If already seen, `continue` the loop.
+- **D-12:** Add `hasUserSeenDog(username: string, dogId: string): Promise<boolean>` to `lib/storage.ts`. Reads swipes.json, checks if dogId record has username in its col array. All JSON reads stay in storage.ts per CLAUDE.md design contract.
 
-### SuperLike
-- **D-05:** SuperLike button maps to "like" action — already implemented in SwipeButtons/SwipeClient. No change needed.
-
-### SWIPE-03
-- **D-06:** `lib/storage.ts` already exposes `findUnseenDog(username)` and `appendAction(dogId, imageUrl, username, email, action)`. Both API routes already use these. SWIPE-03 is complete.
+### Input Validation (WR-02)
+- **D-13:** Guard empty dogId in the fetch loop: `const dogId = extractDogId(data.url); if (!dogId) continue;` — prevents empty-string records in swipes.json.
+- **D-14:** WR-01 (missing username) is moot — auth check (D-07) ensures username always comes from a valid session.
 
 </decisions>
 
@@ -55,12 +61,19 @@ Users can see dog images in a card and swipe like or dislike — each action is 
 - `components/SwipeButtons.tsx` — Dislike (close, w-16), SuperLike (star, w-12), Like (favorite, w-[72px] bg-primary)
 - `components/Navbar.tsx` — Desktop sidebar + mobile bottom nav, useSession for avatar/name, signOut
 
-### API Routes (existing, one needs fix)
-- `app/api/dog/route.ts` — GET ?username=: unseen-first via findUnseenDog, falls back to random.dog; BUG: returns `url` must become `imageUrl`
+### API Routes
+- `app/api/dog/route.ts` — needs: auth() check, res.ok guard, dogId guard, hasUserSeenDog check
 - `app/api/swipe/route.ts` — POST: validates body, calls appendAction
 
 ### Storage
-- `lib/storage.ts` — findUnseenDog(username), appendAction(dogId, imageUrl, username, email, action), readDogs(), ensureStore()
+- `lib/storage.ts` — findUnseenDog(username), appendAction(...), readDogs(), ensureStore(); add hasUserSeenDog(username, dogId)
+
+### Auth
+- `auth.ts` — NextAuth v5 config; exports `auth`, `handlers`, `signIn`, `signOut`. Use `auth()` for server-side session.
+- `app/api/auth/[...nextauth]/route.ts` — Only exports GET + POST handlers. Does NOT export authOptions.
+
+### Code Review Findings
+- `.planning/phases/03-swipe-ui/03-REVIEW.md` — CR-01, CR-02, CR-03, WR-01, WR-02, WR-03 with fix code
 
 ### Design Reference
 - `design/pawnder_swipe_mobile/` — Mobile swipe layout reference
@@ -75,29 +88,37 @@ Users can see dog images in a card and swipe like or dislike — each action is 
 ## Existing Code Insights
 
 ### Reusable Assets
-- `auth()` from `@/auth` — server-side session guard, already in `app/swipe/page.tsx`
+- `auth()` from `@/auth` — NextAuth v5 server-side session; already used in `app/swipe/page.tsx`
 - `useSession()` from `next-auth/react` — client session access in Navbar
 - `SwipeCard` — accepts `{ imageUrl: string, dogId: string }` props
 - `SwipeButtons` — accepts `{ onDislike, onSuperLike, onLike, disabled? }` props
+- `findUnseenDog(username)` in `lib/storage.ts` — returns first unseen dog record or null
 
 ### Established Patterns
-- Auth guard: `const session = await auth(); if (!session?.user) redirect("/login");` — already in place
-- Session to props: `username={session.user.name ?? session.user.email ?? "user"}` and `email={session.user.email ?? ""}` passed as SwipeClient props
-- Dog fetch: `GET /api/dog?username=${encodeURIComponent(username)}` → response must be `{ imageUrl, dogId }`
-- Swipe POST: `{ dogId, imageUrl, username, email, action }` body — `imageUrl` comes from `dog.imageUrl`
+- Auth guard: `const session = await auth(); if (!session?.user) redirect("/login");` — in `app/swipe/page.tsx`
+- API route auth (to implement): `const session = await auth(); if (!session?.user?.name) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });`
+- Storage reads: always through lib/storage.ts, never fs directly in routes
 
 ### Integration Points
-- **The only code change needed:** In `app/api/dog/route.ts`, two `NextResponse.json()` calls return `url:` — change both to `imageUrl:`.
-  - Line returning unseen dog: `{ url: unseen.imageUrl, ... }` → `{ imageUrl: unseen.imageUrl, ... }`
-  - Line returning random.dog fetch: `{ url: data.url, ... }` → `{ imageUrl: data.url, ... }`
+- **app/api/dog/route.ts changes needed:**
+  1. Import `auth` from `@/auth`
+  2. `const session = await auth(); if (!session?.user?.name) return 401`
+  3. Derive `const username = session.user.name` (drop query param)
+  4. Fetch loop: `if (!res.ok) continue` before `res.json()`
+  5. Fetch loop: `const dogId = extractDogId(data.url); if (!dogId) continue`
+  6. Fetch loop: `if (await hasUserSeenDog(username, dogId)) continue`
+- **lib/storage.ts change:** Export `hasUserSeenDog(username, dogId)` — reads existing records, returns true if username found in col
 
 </code_context>
 
 <specifics>
 ## Specific Ideas
 
-- Fix is surgical: only `/api/dog/route.ts` changes, two `url:` keys renamed to `imageUrl:`
-- No animations in v1 — POLISH-01 (swipe card animate off-screen) stays deferred
+- Auth uses `auth()` not `getServerSession` — codebase is NextAuth v5, authOptions not exported
+- Session is the only authoritative source for username — query param dropped from route logic
+- `hasUserSeenDog` reads same data as `readDogs()` — avoid double file reads if possible by sharing the read
+- WR-03 (race condition in appendAction) explicitly deferred — not fixing in Phase 3
+- No animations in v1 — POLISH-01 stays deferred
 - SuperLike already mapped to "like" — `onSuperLike={() => swipe("like")}` in SwipeClient
 
 </specifics>
@@ -105,12 +126,13 @@ Users can see dog images in a card and swipe like or dislike — each action is 
 <deferred>
 ## Deferred Ideas
 
-- POLISH-01: Swipe card animates off-screen on like/dislike — v2
-- POLISH-03: Distinct error UI (network failure vs no more dogs) — v2
+- **WR-03:** Race condition in `appendAction` (read-modify-write, no file lock). Low concurrency risk for workshop prototype — defer to Polish phase.
+- **POLISH-01:** Swipe card animates off-screen on like/dislike — v2
+- **POLISH-03:** Distinct error UI (network failure vs no more dogs) — v2
 
 </deferred>
 
 ---
 
 *Phase: 3-Swipe UI*
-*Context gathered: 2026-05-10*
+*Context gathered: 2026-05-11 (updated with code review fix decisions)*
