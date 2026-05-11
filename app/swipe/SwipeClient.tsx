@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import SwipeCard from "@/components/SwipeCard";
 import SwipeButtons from "@/components/SwipeButtons";
+import DogLoadingAnimation from "@/components/DogLoadingAnimation";
+import CloseIcon from "@mui/icons-material/Close";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 interface DogData {
   dogId: string;
@@ -22,7 +25,9 @@ export default function SwipeClient({ username, email }: SwipeClientProps) {
   const fetchDog = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/dog?username=${encodeURIComponent(username)}`);
+      const res = await fetch(
+        `/api/dog?username=${encodeURIComponent(username)}`,
+      );
       if (!res.ok) throw new Error("Failed to fetch dog");
       const data = await res.json();
       setDog(data);
@@ -33,7 +38,9 @@ export default function SwipeClient({ username, email }: SwipeClientProps) {
     }
   }, [username]);
 
-  useEffect(() => { fetchDog(); }, [fetchDog]);
+  useEffect(() => {
+    fetchDog();
+  }, [fetchDog]);
 
   const swipe = async (action: "like" | "dislike") => {
     if (!dog || swiping) return;
@@ -42,7 +49,13 @@ export default function SwipeClient({ username, email }: SwipeClientProps) {
       await fetch("/api/swipe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dogId: dog.dogId, imageUrl: dog.imageUrl, username, email, action }),
+        body: JSON.stringify({
+          dogId: dog.dogId,
+          imageUrl: dog.imageUrl,
+          username,
+          email,
+          action,
+        }),
       });
     } finally {
       setSwiping(false);
@@ -50,40 +63,92 @@ export default function SwipeClient({ username, email }: SwipeClientProps) {
     }
   };
 
+  const sharedButtonProps = {
+    onDislike: () => swipe("dislike"),
+    onLike: () => swipe("like"),
+    disabled: swiping,
+  };
+
+  const loadingUI = <DogLoadingAnimation />;
+
+  const emptyUI = (
+    <div className="flex flex-col items-center gap-6 text-center px-5 text-on-surface-variant">
+      <span
+        className="material-symbols-outlined text-[40px]"
+        style={{ fontVariationSettings: "'FILL' 1" }}
+      >
+        pets
+      </span>
+      <p className="text-xl font-semibold text-on-surface">No more dogs!</p>
+      <p className="text-base">You&apos;ve seen them all. Check back later.</p>
+      <button
+        onClick={fetchDog}
+        className="bg-primary text-white rounded-full py-3 px-6 text-sm font-semibold hover:opacity-90 active:scale-95 transition-all shadow-sm"
+      >
+        Try again
+      </button>
+    </div>
+  );
+
   return (
-    <main className="flex-1 w-full max-w-md mx-auto relative px-container-padding pb-[90px] flex flex-col justify-end z-0">
-      {loading ? (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-md text-on-surface-variant">
-            <span className="material-symbols-outlined text-display animate-spin" style={{ fontVariationSettings: "'FILL' 0" }}>autorenew</span>
-            <p className="font-body-md text-body-md">Fetching your next match...</p>
+    <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Mobile layout — card fills space between fixed top nav and fixed bottom buttons */}
+      <div className="md:hidden flex-1 flex flex-col px-4 pt-4 pb-36">
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center">
+            {loadingUI}
           </div>
-        </div>
-      ) : dog ? (
-        <>
-          <SwipeCard imageUrl={dog.imageUrl} dogId={dog.dogId} />
-          <SwipeButtons
-            onDislike={() => swipe("dislike")}
-            onSuperLike={() => swipe("like")}
-            onLike={() => swipe("like")}
+        ) : dog ? (
+          <div className="flex-1 rounded-3xl overflow-hidden">
+            <SwipeCard imageUrl={dog.imageUrl} dogId={dog.dogId} />
+          </div>
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            {emptyUI}
+          </div>
+        )}
+      </div>
+
+      {/* Mobile fixed buttons — pinned bottom-0, safe-area padding */}
+      {!loading && dog && (
+        <div
+          className="md:hidden fixed bottom-0 left-0 right-0 flex justify-center items-center gap-8 pt-4 bg-surface/90 backdrop-blur-sm z-40"
+          style={{
+            paddingBottom: "max(env(safe-area-inset-bottom, 0px), 32px)",
+          }}
+        >
+          <button
+            onClick={() => swipe("dislike")}
             disabled={swiping}
-          />
-        </>
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-md text-center px-container-padding text-on-surface-variant">
-            <span className="material-symbols-outlined text-display" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
-            <p className="font-headline-md text-headline-md text-on-surface">No more dogs!</p>
-            <p className="font-body-md text-body-md">You&apos;ve seen them all. Check back later.</p>
-            <button
-              onClick={fetchDog}
-              className="bg-primary text-on-primary rounded-full py-sm px-md font-label-lg text-label-lg hover:bg-surface-tint transition-colors active:scale-95 shadow-sm"
-            >
-              Try again
-            </button>
-          </div>
+            className="w-16 h-16 rounded-full bg-surface border-2 border-outline-variant shadow-[0_4px_16px_rgba(0,0,0,0.08)] flex items-center justify-center text-error hover:bg-surface-variant active:scale-95 transition-all duration-200 disabled:opacity-50"
+          >
+            <CloseIcon sx={{ fontSize: 32 }} />
+          </button>
+          <button
+            onClick={() => swipe("like")}
+            disabled={swiping}
+            className="w-20 h-20 rounded-full bg-primary shadow-[0_6px_20px_rgba(155,69,0,0.25)] flex items-center justify-center text-white active:scale-90 transition-transform duration-200 disabled:opacity-50"
+          >
+            <FavoriteIcon sx={{ fontSize: 36 }} />
+          </button>
         </div>
       )}
-    </main>
+
+      {/* Desktop layout */}
+      <div className="hidden md:flex flex-1 flex-col items-center justify-center p-6 overflow-hidden">
+        {loading ? (
+          loadingUI
+        ) : dog ? (
+          <>
+            <div className="w-full max-w-[420px] mx-auto aspect-[3/4] max-h-[716px]">
+              <SwipeCard imageUrl={dog.imageUrl} dogId={dog.dogId} />
+            </div>
+            <SwipeButtons {...sharedButtonProps} className="mt-8" />
+          </>
+        ) : (
+          emptyUI
+        )}
+      </div>
+    </div>
   );
 }

@@ -11,12 +11,7 @@ export default async function SwipePage() {
     <div className="bg-surface text-on-surface h-screen flex flex-col overflow-hidden antialiased">
       <Navbar />
 
-      <div className="md:ml-64 flex flex-col h-full">
-        {/* Mobile header */}
-        <header className="md:hidden w-full pt-sm pb-xs px-container-padding flex justify-center items-center flex-shrink-0 z-10">
-          <h1 className="font-display text-headline-lg text-primary tracking-tight">Dogs Tinder</h1>
-        </header>
-
+      <div className="md:ml-64 pt-16 md:pt-0 flex flex-col h-full">
         <SwipeClient
           username={session.user.name ?? session.user.email ?? "user"}
           email={session.user.email ?? ""}
