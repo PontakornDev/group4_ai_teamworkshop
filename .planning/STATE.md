@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 
 ## Current Position
 
-Phase: 4 of 5 (History Page)
-Plan: 0 of ? in current phase
-Status: Phase 3 complete — ready to plan Phase 4
-Last activity: 2026-05-11 — Phase 3 complete (swipe loop verified end-to-end, both plans done)
+Phase: 3 of 5 (Swipe UI — code review fixes)
+Plan: 0 of 1 pending (03-03)
+Status: Phase 3 code review fix plan ready — execute 03-03 then proceed to Phase 4
+Last activity: 2026-05-11 — Phase 3 plan 03-03 added (auth gate + fetch loop hardening: CR-01, CR-02, CR-03, WR-02)
 
 Progress: [███████░░░] 70%
 
