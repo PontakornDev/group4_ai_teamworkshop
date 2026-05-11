@@ -21,7 +21,7 @@ created: 2026-05-11
 | Preset | not applicable |
 | Component library | none (custom components only) |
 | Icon library | Material Symbols Outlined — Google Fonts, filled variant for active states |
-| Font | Quicksand 400/500/600/700 — Google Fonts |
+| Font | Quicksand 400/700 — Google Fonts |
 
 Source: `app/globals.css` @theme block — tokens already live in the codebase.
 
@@ -54,26 +54,25 @@ Source: `app/globals.css` spacing tokens; `design/pawnder_history_mobile/code.ht
 
 ## Typography
 
+4-size scale, 2-weight scale:
+
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
-| Display | 40px | 700 | 1.2 | `text-display font-display` |
-| Heading LG | 32px | 700 | 1.2 | `text-headline-lg font-headline-lg` |
-| Heading MD | 24px | 600 | 1.3 | `text-headline-md font-headline-md` |
-| Body MD | 16px | 400 | 1.6 | `text-body-md font-body-md` |
-| Label LG | 14px | 600 | 1.2 | `text-label-lg font-label-lg` |
-| Label SM | 12px | 700 | 1.2 | `text-label-sm font-label-sm` |
+| Heading LG | 32px | 700 | 1.2 | `text-headline-lg font-bold` |
+| Heading MD | 24px | 700 | 1.3 | `text-headline-md font-bold` |
+| Body MD | 16px | 400 | 1.6 | `text-body-md font-normal` |
+| Label LG | 14px | 700 | 1.2 | `text-label-lg font-bold` |
 
 Usage assignments for this phase:
-- Page title "Your Swipe History": `text-headline-lg` (mobile) / `text-display` (desktop)
+- Page title "Your Swipe History": `text-headline-lg` (mobile and desktop) — no Display size; Heading LG 32px used for both breakpoints
 - Page subtitle: `text-body-md text-on-surface-variant`
 - Dog card title (dogId truncated): `text-headline-md`
 - Swipe count label: `text-body-md text-on-surface-variant`
-- Summary bar chip labels: `text-label-lg`
-- Summary bar chip counts: `text-label-sm` or `text-headline-md` (large number emphasis)
+- Summary bar chip labels and counts: `text-label-lg`
 - Filter pill labels: `text-label-lg`
 - Sort dropdown label: `text-body-md`
-- Action badge text (Like / Dislike): `text-label-sm`
-- Timestamp on desktop cards: `text-label-sm text-on-surface-variant`
+- Action badge text (Like / Dislike): `text-label-lg` — consolidated from former Label SM 12px
+- Timestamp on desktop cards: `text-label-lg text-on-surface-variant` — consolidated from former Label SM 12px
 - Empty state heading: `text-headline-md`
 - Empty state body: `text-body-md`
 
@@ -98,6 +97,8 @@ Accent reserved for:
 - Active nav link text in desktop sidebar (via `bg-secondary-container text-on-secondary-container` — same pattern as Navbar.tsx)
 - Focus ring on filter/sort interactive controls (`focus:ring-primary`)
 
+Primary visual anchor: the dog card grid/list — the largest image-bearing elements on screen draw the eye first.
+
 Source: `app/globals.css` color tokens; `CLAUDE.md` Phase 4 design contract; `components/HistoryList.tsx` ActionBadge; `components/Navbar.tsx` active state pattern.
 
 ---
@@ -116,11 +117,11 @@ Source: `app/globals.css` color tokens; `CLAUDE.md` Phase 4 design contract; `co
 | Element | Description | Tailwind Pattern |
 |---------|-------------|-----------------|
 | SummaryBar | Sticky row of 3 stat chips (Swiped / Likes / Dislikes) for current user | `sticky top-16 md:top-0 z-30 bg-surface py-sm flex gap-sm` |
-| StatChip | Pill chip showing icon + count label | `inline-flex items-center gap-xs px-sm py-xs rounded-full bg-surface-container-low border border-outline-variant text-on-surface font-label-lg text-label-lg` |
+| StatChip | Pill chip showing icon + count label | `inline-flex items-center gap-xs px-sm py-xs rounded-full bg-surface-container-low border border-outline-variant text-on-surface font-bold text-label-lg` |
 | FilterPills | Row of pill tabs: All / Likes / Dislikes | `flex gap-sm overflow-x-auto no-scrollbar` |
-| FilterPill (active) | Active filter pill tab | `bg-primary-container text-on-primary-container font-label-lg text-label-lg px-6 py-2 rounded-full shadow-sm` |
-| FilterPill (inactive) | Inactive filter pill tab | `bg-surface-container-low text-on-surface-variant font-label-lg text-label-lg px-6 py-2 rounded-full border border-outline-variant hover:bg-surface-container-high transition-colors` |
-| SortDropdown | `<select>` dropdown: Newest first / Oldest first | `bg-surface-container-low border border-outline-variant rounded-full px-sm py-xs font-body-md text-body-md text-on-surface focus:outline-none focus:ring-1 focus:ring-primary` |
+| FilterPill (active) | Active filter pill tab | `bg-primary-container text-on-primary-container font-bold text-label-lg px-6 py-2 rounded-full shadow-sm` |
+| FilterPill (inactive) | Inactive filter pill tab | `bg-surface-container-low text-on-surface-variant font-bold text-label-lg px-6 py-2 rounded-full border border-outline-variant hover:bg-surface-container-high transition-colors` |
+| SortDropdown | `<select>` dropdown: Newest first / Oldest first | `bg-surface-container-low border border-outline-variant rounded-full px-sm py-xs font-normal text-body-md text-on-surface focus:outline-none focus:ring-1 focus:ring-primary` |
 | ActionBadge | Already exists — Like (green) or Dislike (red) pill badge | No change to existing ActionBadge component |
 | EmptyFiltered | Shown when filter returns 0 results (distinct from global empty) | `flex flex-col items-center py-xl text-on-surface-variant` |
 
@@ -147,7 +148,7 @@ Source: `app/globals.css` color tokens; `CLAUDE.md` Phase 4 design contract; `co
       [Dog info — flex-1]
         h3: #dogId (8 chars) — text-headline-md text-on-surface
         p: "N swipes" — text-body-md text-on-surface-variant
-        p: timestamp — text-label-sm text-on-surface-variant (mobile only on card)
+        p: timestamp — text-label-lg text-on-surface-variant (mobile only on card)
       [ActionBadge: Like|Dislike]
 [BottomNav — NOT rendered on /history; existing Navbar.tsx uses mobile top bar on this page]
 ```
@@ -159,7 +160,7 @@ Source: `app/globals.css` color tokens; `CLAUDE.md` Phase 4 design contract; `co
   "My Matches" nav link active: bg-secondary-container text-on-secondary-container rounded-xl
 [Main content — ml-64 px-container-padding md:px-xl pt-lg pb-xl overflow-y-auto]
   [Page header — flex flex-row items-end justify-between mb-lg]
-    [Left: h2 "Your Swipe History" text-display text-on-surface + subtitle text-body-lg]
+    [Left: h2 "Your Swipe History" text-headline-lg text-on-surface + subtitle text-body-md]
     [Right: SortDropdown]
   [SummaryBar — flex gap-sm mb-lg]
     [StatChip: Swiped N] [StatChip: ❤ N Likes] [StatChip: ✕ N Dislikes]
@@ -172,7 +173,7 @@ Source: `app/globals.css` color tokens; `CLAUDE.md` Phase 4 design contract; `co
       [Circular thumbnail 128px — border-4 border-surface]
       h3: #dogId — text-headline-md text-on-surface mb-xs
       p: "N swipes" — text-body-md text-on-surface-variant mb-md
-      [mt-auto — ActionBadge + timestamp label-sm]
+      [mt-auto — ActionBadge + timestamp text-label-lg]
 ```
 
 Source: `design/pawnder_history_mobile/code.html`, `design/pawnder_history_desktop/code.html`, existing `components/HistoryList.tsx` and `components/Navbar.tsx`.
