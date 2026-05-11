@@ -10,24 +10,25 @@ A user can log in, swipe on dogs, and have their swipes saved — the loop must 
 
 ## Current State
 
-**v0.1 shipped 2026-05-08** — API layer complete. Backend routes live and tested (15/15 tests pass). Phases 2-3 (Login + Swipe UI) in progress for v1.0.
+**Phase 3 complete 2026-05-11** — Full core loop working: login → swipe → persist. Phase 4 (History Page) is next. v1.0 milestone 70% complete.
 
 ## Requirements
 
-### Validated (v0.1)
+### Validated (v0.1 + Phase 2 + Phase 3)
 
 - App fetches random dog image from random.dog, skips .mp4 URLs ✓ (Phase 1)
 - Swipe records saved to /data/swipes.json grouped by dog: `{dogId, imageUrl, col: [{username, email, action, timestamp}]}` ✓ (Phase 1 schema; email field added in Phase 2 scope)
 - History readable from /data/swipes.json ✓ (Phase 1)
+- User signs in with Google (NextAuth) on /login and is redirected to /swipe ✓ (Phase 2)
+- Active NextAuth session required before accessing /swipe; no session → redirect to /login ✓ (Phase 2)
+- GET /api/dog?username= serves an unseen dog from storage first; falls back to random.dog only when none available ✓ (Phase 1 + Phase 3)
+- User can swipe like or dislike on a dog image ✓ (Phase 3)
+- Each swipe appends `{username, email, action, timestamp}` to the dog's `col` array in /data/swipes.json via lib/storage.ts appendAction ✓ (Phase 3)
+- Google avatar + display name visible in the navbar while swiping ✓ (Phase 3)
 
 ### Active
 
-- [ ] User signs in with Google (NextAuth) on /login and is redirected to /swipe
-- [ ] Active NextAuth session required before accessing /swipe; no session → redirect to /login
-- [ ] GET /api/dog?username= serves an unseen dog from storage first; falls back to random.dog only when none available (skips .mp4 URLs)
-- [ ] User can swipe right (like) or left (dislike) on a dog image
-- [ ] Each swipe appends `{username, email, action, timestamp}` to the dog's `col` array in /data/swipes.json via lib/storage.ts appendAction
-- [ ] Google avatar + display name visible in the navbar while swiping
+- [ ] /history page lists all swipe records grouped by username with summary bar, action filter, timestamp sort
 
 ### Out of Scope
 
@@ -57,8 +58,8 @@ Example: "https://random.dog/d40de385-3626-46c8-94bf-b7097226174f.jpg" → "d40d
 |----------|-----------|---------|
 | App Router (not Pages Router) | Workshop uses latest Next.js patterns | ✅ Validated (Phase 1) |
 | JSON file storage | No DB setup overhead for prototype | ✅ Validated (Phase 1) |
-| NextAuth.js + Google OAuth for identity | Real identity, no custom auth UI, session managed by NextAuth | ⏳ Pending (Phase 2) |
-| Buttons for swipe (not drag) | Simpler to build, drag optional later | ⏳ Pending (Phase 3) |
+| NextAuth.js + Google OAuth for identity | Real identity, no custom auth UI, session managed by NextAuth | ✅ Validated (Phase 2) |
+| Buttons for swipe (not drag) | Simpler to build, drag optional later | ✅ Validated (Phase 3) |
 | Skip .mp4 URLs silently | random.dog returns video sometimes; re-fetch is cleaner UX | ✅ Validated (Phase 1) |
 | data/swipes.json in .gitignore | Avoid team conflicts on shared swipe data | ✅ Validated (Phase 1) |
 
@@ -80,4 +81,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-08 after v0.1 milestone*
+*Last updated: 2026-05-11 — Phase 3 complete, core loop validated*

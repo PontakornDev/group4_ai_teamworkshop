@@ -14,21 +14,21 @@
 
 - [x] **SWIPE-01**: POST /api/swipe upserts `/data/swipes.json` — finds existing record by `dogId` or creates one (`{dogId, imageUrl, col: []}`), then appends `{username, email, action, timestamp}` to its `col` array
 - [x] **SWIPE-02**: GET /api/swipe (or /api/history) reads all records from `/data/swipes.json`
-- [ ] **SWIPE-03**: `lib/storage.ts` exposes `findUnseenDog(username)` (returns first dog record where username absent from col, or null) and `appendAction(dogId, imageUrl, username, email, action)` (upsert with email in col entry); all API routes use these functions instead of reading fs directly
+- [x] **SWIPE-03**: `lib/storage.ts` exposes `findUnseenDog(username)` (returns first dog record where username absent from col, or null) and `appendAction(dogId, imageUrl, username, email, action)` (upsert with email in col entry); all API routes use these functions instead of reading fs directly
 
 ### Login / Identity
 
-- [ ] **LOGIN-01**: `/login` page shows "Sign in with Google" button; clicking it initiates NextAuth Google OAuth flow
-- [ ] **LOGIN-02**: After Google OAuth, NextAuth session is established with `session.user.name`, `session.user.email`, `session.user.image`; env vars `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL` required
-- [ ] **LOGIN-03**: Visiting `/swipe` or `/history` without an active NextAuth session redirects to `/login`
+- [x] **LOGIN-01**: `/login` page shows "Sign in with Google" button; clicking it initiates NextAuth Google OAuth flow
+- [x] **LOGIN-02**: After Google OAuth, NextAuth session is established with `session.user.name`, `session.user.email`, `session.user.image`; env vars `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL` required
+- [x] **LOGIN-03**: Visiting `/swipe` or `/history` without an active NextAuth session redirects to `/login`
 
 ### Swipe UI
 
-- [ ] **UI-01**: `/swipe` page displays the current dog image in a card
-- [ ] **UI-02**: User can click Like or Dislike buttons on the swipe page
-- [ ] **UI-03**: Each button click sends a POST /api/swipe with the correct action and username
-- [ ] **UI-04**: Next dog image loads automatically after each swipe
-- [ ] **UI-05**: Navbar displays Google avatar + display name while on the swipe page
+- [x] **UI-01**: `/swipe` page displays the current dog image in a card
+- [x] **UI-02**: User can click Like or Dislike buttons on the swipe page
+- [x] **UI-03**: Each button click sends a POST /api/swipe with the correct action and username
+- [x] **UI-04**: Next dog image loads automatically after each swipe
+- [x] **UI-05**: Navbar displays Google avatar + display name while on the swipe page
 
 ## v2 Requirements
 
@@ -71,15 +71,15 @@
 | DOG-02 | Phase 1 | Complete (01-01) |
 | SWIPE-01 | Phase 1 | Complete (01-01) — upsert refactor via lib/storage.ts in Phase 3 |
 | SWIPE-02 | Phase 1 | Complete (01-01) |
-| SWIPE-03 | Phase 3 | Pending — lib/storage.ts + route refactor |
-| LOGIN-01 | Phase 2 | Pending |
-| LOGIN-02 | Phase 2 | Pending |
-| LOGIN-03 | Phase 2 | Pending |
-| UI-01 | Phase 3 | Pending |
-| UI-02 | Phase 3 | Pending |
-| UI-03 | Phase 3 | Pending |
-| UI-04 | Phase 3 | Pending |
-| UI-05 | Phase 3 | Pending |
+| SWIPE-03 | Phase 3 | Complete (03-01) |
+| LOGIN-01 | Phase 2 | Complete (02-02) |
+| LOGIN-02 | Phase 2 | Complete (02-02) |
+| LOGIN-03 | Phase 2 | Complete (02-02) |
+| UI-01 | Phase 3 | Complete (03-02) |
+| UI-02 | Phase 3 | Complete (03-02) |
+| UI-03 | Phase 3 | Complete (03-02) |
+| UI-04 | Phase 3 | Complete (03-02) |
+| UI-05 | Phase 3 | Complete (03-02) |
 | HIST-03 | Phase 4 | Pending |
 | HIST-04 | Phase 4 | Pending |
 | TOP-01 | Phase 5 | Pending |
@@ -95,4 +95,4 @@
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-10 — Top Dogs feature (Phase 5) added; HIST-03/04 promoted from implicit to explicit*
+*Last updated: 2026-05-11 — Phase 3 complete; UI-01–05, SWIPE-03, LOGIN-01–03 marked complete*

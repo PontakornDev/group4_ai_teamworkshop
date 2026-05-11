@@ -21,7 +21,7 @@ Three vertical slices deliver the full core loop: API routes first (the data lay
 ## 🚧 v1.0 — Full Core Loop (IN PROGRESS)
 
 - [x] **Phase 2: Login Page** - Users sign in with Google (NextAuth) and the app guards /swipe access
-- [ ] **Phase 3: Swipe UI** - Users can swipe on dogs with full like/dislike flow and persistence
+- [x] **Phase 3: Swipe UI** - Users can swipe on dogs with full like/dislike flow and persistence (complete 2026-05-11)
 - [ ] **Phase 4: History Page** - Show all like/dislike records grouped by username with summary bar, filters, and sort
 - [ ] **Phase 5: Top Dogs** - Most liked and most disliked dog highlight cards at the top of the history page, backed by `getTopDogs()` and GET `/api/stats`
 
@@ -58,8 +58,8 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01-PLAN.md — Fix url→imageUrl field name bug in app/api/dog/route.ts (two NextResponse.json() calls)
-- [ ] 03-02-PLAN.md — End-to-end verification: automated pre-flight checks + human swipe loop checkpoint
+- [x] 03-01-PLAN.md — Fix url→imageUrl field name bug in app/api/dog/route.ts (two NextResponse.json() calls)
+- [x] 03-02-PLAN.md — End-to-end verification: automated pre-flight checks + human swipe loop checkpoint
 
 ### Phase 4: History Page
 **Goal**: Users can view all swipe records grouped by username — with a summary bar showing total likes/dislikes per user, action filter (all/like/dislike), and timestamp sort
@@ -95,6 +95,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. API Layer | 1/1 | ✅ Complete | 2026-05-08 |
 | 2. Login Page | 2/2 | ✅ Complete | 2026-05-10 |
-| 3. Swipe UI | 0/2 | In progress | - |
+| 3. Swipe UI | 2/2 | ✅ Complete | 2026-05-11 |
 | 4. History Page | 0/? | Not started | - |
 | 5. Top Dogs | 0/? | Not started | - |
