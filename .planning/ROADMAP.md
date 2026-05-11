@@ -73,8 +73,12 @@ Plans:
   3. User can filter records by action: all / like / dislike
   4. Records are sortable by timestamp (newest first by default)
   5. UI matches Stitch design export for history page (mobile + desktop layouts)
-**Plans**: TBD
+**Plans**: 2 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 04-01-PLAN.md — Extend HistoryList.tsx: useState hooks, user-filter, sort, summary bar, filter pills, sort dropdown, filtered empty state, typography corrections
+- [ ] 04-02-PLAN.md — Update history/page.tsx: fix title ("Your Swipe History"), mobile/desktop subtitles, typography classes
 
 ### Phase 5: Top Dogs
 **Goal**: Show the most liked and most disliked dogs as highlight cards at the top of the history page

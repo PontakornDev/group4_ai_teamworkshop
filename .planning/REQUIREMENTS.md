@@ -80,6 +80,8 @@
 | UI-03 | Phase 3 | Complete (03-02) |
 | UI-04 | Phase 3 | Complete (03-02) |
 | UI-05 | Phase 3 | Complete (03-02) |
+| HIST-01 | Phase 4 | Pending |
+| HIST-02 | Phase 4 | Pending |
 | HIST-03 | Phase 4 | Pending |
 | HIST-04 | Phase 4 | Pending |
 | TOP-01 | Phase 5 | Pending |
