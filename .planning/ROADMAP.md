@@ -54,12 +54,13 @@ Plans:
   3. Each button click sends a POST to /api/swipe with the correct action, dogId, imageUrl, username (session.user.name), and email (session.user.email)
   4. After each swipe, the next dog image loads automatically in the card
   5. The navbar displays Google avatar (session.user.image) + display name while on the swipe page
-**Plans**: 2 plans
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
 - [x] 03-01-PLAN.md — Fix url→imageUrl field name bug in app/api/dog/route.ts (two NextResponse.json() calls)
 - [x] 03-02-PLAN.md — End-to-end verification: automated pre-flight checks + human swipe loop checkpoint
+- [ ] 03-03-PLAN.md — Code review fixes: auth gate (CR-01), res.ok guard (CR-02), hasUserSeenDog helper + seen check (CR-03), empty dogId guard (WR-02)
 
 ### Phase 4: History Page
 **Goal**: Users can view all swipe records grouped by username — with a summary bar showing total likes/dislikes per user, action filter (all/like/dislike), and timestamp sort
@@ -95,6 +96,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. API Layer | 1/1 | ✅ Complete | 2026-05-08 |
 | 2. Login Page | 2/2 | ✅ Complete | 2026-05-10 |
-| 3. Swipe UI | 2/2 | ✅ Complete | 2026-05-11 |
+| 3. Swipe UI | 2/3 | 🔧 Code review fixes pending | 2026-05-11 |
 | 4. History Page | 0/? | Not started | - |
 | 5. Top Dogs | 0/? | Not started | - |
