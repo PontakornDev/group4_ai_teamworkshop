@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { readDogs } from "@/lib/storage";
+import { getHistoryWithCounts } from "@/lib/storage";
 
 export async function GET(): Promise<NextResponse> {
-  const records = await readDogs();
-  return NextResponse.json(records);
+  const summaries = await getHistoryWithCounts();
+  return NextResponse.json(summaries);
 }

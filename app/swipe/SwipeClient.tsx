@@ -100,7 +100,14 @@ export default function SwipeClient({ username, email }: SwipeClientProps) {
           </div>
         ) : dog ? (
           <div className="flex-1 rounded-3xl overflow-hidden">
-            <SwipeCard imageUrl={dog.imageUrl} dogId={dog.dogId} />
+            <SwipeCard
+              key={dog.dogId}
+              imageUrl={dog.imageUrl}
+              dogId={dog.dogId}
+              onLike={() => swipe("like")}
+              onDislike={() => swipe("dislike")}
+              disabled={swiping}
+            />
           </div>
         ) : (
           <div className="flex-1 flex items-center justify-center">
@@ -141,7 +148,7 @@ export default function SwipeClient({ username, email }: SwipeClientProps) {
         ) : dog ? (
           <>
             <div className="w-full max-w-[420px] mx-auto aspect-[3/4] max-h-[716px]">
-              <SwipeCard imageUrl={dog.imageUrl} dogId={dog.dogId} />
+              <SwipeCard key={dog.dogId} imageUrl={dog.imageUrl} dogId={dog.dogId} />
             </div>
             <SwipeButtons {...sharedButtonProps} className="mt-8" />
           </>

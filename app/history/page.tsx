@@ -2,13 +2,13 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import HistoryList from "@/components/HistoryList";
-import { readDogs } from "@/lib/storage";
+import { getHistoryWithCounts } from "@/lib/storage";
 
 export default async function HistoryPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const records = await readDogs();
+  const records = await getHistoryWithCounts();
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex antialiased">
@@ -38,10 +38,7 @@ export default async function HistoryPage() {
             </div>
           </div>
 
-          <HistoryList
-            records={records}
-            currentUser={session.user.name ?? session.user.email ?? undefined}
-          />
+          <HistoryList records={records} />
         </div>
       </main>
     </div>

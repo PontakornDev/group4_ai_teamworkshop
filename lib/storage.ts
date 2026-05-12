@@ -17,6 +17,14 @@ export interface DogRecord {
   col: SwipeAction[];
 }
 
+export interface DogSummary {
+  dogId: string;
+  imageUrl: string;
+  likeCount: number;
+  dislikeCount: number;
+  latestTimestamp: string;
+}
+
 export async function ensureStore(): Promise<void> {
   await fs.mkdir(DATA_DIR, { recursive: true });
   try {
@@ -35,6 +43,17 @@ export async function readDogs(): Promise<DogRecord[]> {
 export async function findUnseenDog(username: string): Promise<DogRecord | null> {
   const dogs = await readDogs();
   return dogs.find((d) => !d.col.some((a) => a.username === username)) ?? null;
+}
+
+export async function getHistoryWithCounts(): Promise<DogSummary[]> {
+  const dogs = await readDogs();
+  return dogs.map((d) => ({
+    dogId: d.dogId,
+    imageUrl: d.imageUrl,
+    likeCount: d.col.filter((c) => c.action === "like").length,
+    dislikeCount: d.col.filter((c) => c.action === "dislike").length,
+    latestTimestamp: d.col.reduce((max, c) => (c.timestamp > max ? c.timestamp : max), ""),
+  }));
 }
 
 export async function appendAction(
