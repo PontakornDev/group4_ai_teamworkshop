@@ -111,3 +111,81 @@ describe("findUnseenDog", () => {
     expect(result!.dogId).toBe("dog2");
   });
 });
+
+describe("getTopDogs", () => {
+  it("returns { mostLiked: null, mostDisliked: null } when swipes.json is empty", async () => {
+    const { getTopDogs } = await getStorage();
+    const result = await getTopDogs();
+    expect(result).toEqual({ mostLiked: null, mostDisliked: null });
+  });
+
+  it("returns mostLiked with correct shape when one dog has 3 likes, mostDisliked null", async () => {
+    const { appendAction, getTopDogs } = await getStorage();
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "alice@example.com", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "bob", "bob@example.com", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "carol", "carol@example.com", "like");
+    const result = await getTopDogs();
+    expect(result.mostLiked).toEqual({
+      dogId: "dog1",
+      imageUrl: "https://example.com/dog1.jpg",
+      likeCount: 3,
+    });
+    expect(result.mostDisliked).toBeNull();
+  });
+
+  it("returns dog with more likes as mostLiked when two dogs compete", async () => {
+    const { appendAction, getTopDogs } = await getStorage();
+    // dogA gets 2 likes
+    await appendAction("dogA", "https://example.com/dogA.jpg", "alice", "alice@example.com", "like");
+    await appendAction("dogA", "https://example.com/dogA.jpg", "bob", "bob@example.com", "like");
+    // dogB gets 5 likes
+    await appendAction("dogB", "https://example.com/dogB.jpg", "carol", "carol@example.com", "like");
+    await appendAction("dogB", "https://example.com/dogB.jpg", "dave", "dave@example.com", "like");
+    await appendAction("dogB", "https://example.com/dogB.jpg", "eve", "eve@example.com", "like");
+    await appendAction("dogB", "https://example.com/dogB.jpg", "frank", "frank@example.com", "like");
+    await appendAction("dogB", "https://example.com/dogB.jpg", "grace", "grace@example.com", "like");
+    const result = await getTopDogs();
+    expect(result.mostLiked!.dogId).toBe("dogB");
+    expect(result.mostLiked!.likeCount).toBe(5);
+  });
+
+  it("first encountered dog wins on tie for mostLiked (stable, first-encountered)", async () => {
+    const { appendAction, getTopDogs } = await getStorage();
+    // dogA and dogB both get 3 likes — dogA is encountered first
+    await appendAction("dogA", "https://example.com/dogA.jpg", "alice", "alice@example.com", "like");
+    await appendAction("dogA", "https://example.com/dogA.jpg", "bob", "bob@example.com", "like");
+    await appendAction("dogA", "https://example.com/dogA.jpg", "carol", "carol@example.com", "like");
+    await appendAction("dogB", "https://example.com/dogB.jpg", "dave", "dave@example.com", "like");
+    await appendAction("dogB", "https://example.com/dogB.jpg", "eve", "eve@example.com", "like");
+    await appendAction("dogB", "https://example.com/dogB.jpg", "frank", "frank@example.com", "like");
+    const result = await getTopDogs();
+    expect(result.mostLiked!.dogId).toBe("dogA");
+  });
+
+  it("counts only 'like' for mostLiked and only 'dislike' for mostDisliked (mixed actions)", async () => {
+    const { appendAction, getTopDogs } = await getStorage();
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "alice@example.com", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "bob", "bob@example.com", "dislike");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "carol", "carol@example.com", "like");
+    const result = await getTopDogs();
+    expect(result.mostLiked!.likeCount).toBe(2);
+    expect(result.mostDisliked!.dislikeCount).toBe(1);
+  });
+
+  it("returns correct mostLiked and mostDisliked from different dogs", async () => {
+    const { appendAction, getTopDogs } = await getStorage();
+    // dog1: 2 likes, 1 dislike
+    await appendAction("dog1", "https://example.com/dog1.jpg", "alice", "alice@example.com", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "bob", "bob@example.com", "like");
+    await appendAction("dog1", "https://example.com/dog1.jpg", "carol", "carol@example.com", "dislike");
+    // dog2: 0 likes, 3 dislikes
+    await appendAction("dog2", "https://example.com/dog2.jpg", "dave", "dave@example.com", "dislike");
+    await appendAction("dog2", "https://example.com/dog2.jpg", "eve", "eve@example.com", "dislike");
+    await appendAction("dog2", "https://example.com/dog2.jpg", "frank", "frank@example.com", "dislike");
+    const result = await getTopDogs();
+    expect(result.mostLiked!.dogId).toBe("dog1");
+    expect(result.mostLiked!.likeCount).toBe(2);
+    expect(result.mostDisliked!.dogId).toBe("dog2");
+    expect(result.mostDisliked!.dislikeCount).toBe(3);
+  });
+});
