@@ -56,3 +56,30 @@ export async function appendAction(
   await fs.writeFile(SWIPES_FILE, JSON.stringify(dogs, null, 2), "utf-8");
   return dogs.find((d) => d.dogId === dogId)!;
 }
+
+export interface TopDogsResult {
+  mostLiked: { dogId: string; imageUrl: string; likeCount: number } | null;
+  mostDisliked: { dogId: string; imageUrl: string; dislikeCount: number } | null;
+}
+
+export async function getTopDogs(): Promise<TopDogsResult> {
+  const dogs = await readDogs();
+
+  let mostLiked: { dogId: string; imageUrl: string; likeCount: number } | null = null;
+  let mostDisliked: { dogId: string; imageUrl: string; dislikeCount: number } | null = null;
+
+  for (const dog of dogs) {
+    const likeCount = dog.col.filter((a) => a.action === "like").length;
+    const dislikeCount = dog.col.filter((a) => a.action === "dislike").length;
+
+    if (likeCount > 0 && (mostLiked === null || likeCount > mostLiked.likeCount)) {
+      mostLiked = { dogId: dog.dogId, imageUrl: dog.imageUrl, likeCount };
+    }
+
+    if (dislikeCount > 0 && (mostDisliked === null || dislikeCount > mostDisliked.dislikeCount)) {
+      mostDisliked = { dogId: dog.dogId, imageUrl: dog.imageUrl, dislikeCount };
+    }
+  }
+
+  return { mostLiked, mostDisliked };
+}
