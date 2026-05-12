@@ -25,8 +25,16 @@ export default async function HistoryPage() {
         <div className="max-w-7xl mx-auto px-container-padding md:px-xl pt-lg">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
             <div>
-              <h2 className="font-display text-display text-on-surface mb-xs">Your Furry Matches</h2>
-              <p className="font-body-lg text-body-lg text-on-surface-variant">Here are the companions you&apos;ve connected with recently.</p>
+              {/* Title: text-headline-lg per UI-SPEC — not text-display (UI-SPEC typography correction) */}
+              <h2 className="font-bold text-headline-lg text-on-surface mb-xs">Your Swipe History</h2>
+              {/* Mobile subtitle */}
+              <p className="font-body-md text-body-md text-on-surface-variant md:hidden">
+                All the dogs you&apos;ve swiped on.
+              </p>
+              {/* Desktop subtitle */}
+              <p className="font-body-md text-body-md text-on-surface-variant hidden md:block">
+                Here are the companions you&apos;ve connected with recently.
+              </p>
             </div>
           </div>
 
