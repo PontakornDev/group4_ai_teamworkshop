@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import Image from "next/image";
 
 interface ColEntry {
@@ -35,6 +36,49 @@ function ActionBadge({ action }: { action: "like" | "dislike" }) {
 }
 
 export default function HistoryList({ records, currentUser }: HistoryListProps) {
+  const [filter, setFilter] = useState<"all" | "like" | "dislike">("all");
+  const [sort, setSort] = useState<"newest" | "oldest">("newest");
+
+  // Guard: currentUser undefined means we cannot match swipes to a user — show empty state
+  // (Placed after hooks to satisfy Rules of Hooks; useMemos below still run but produce [])
+  const mine = useMemo(
+    () =>
+      currentUser
+        ? records.filter((r) => r.col.some((e) => e.username === currentUser))
+        : [],
+    [records, currentUser]
+  );
+
+  // Apply action filter — runs after user-scope filter (D-07, D-09)
+  const filtered = useMemo(() => {
+    if (filter === "all") return mine;
+    return mine.filter(
+      (r) => r.col.find((e) => e.username === currentUser)?.action === filter
+    );
+  }, [mine, filter, currentUser]);
+
+  // Sort by current user's swipe timestamp (D-08) — applied after filter
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      const tsA = a.col.find((e) => e.username === currentUser)?.timestamp ?? "";
+      const tsB = b.col.find((e) => e.username === currentUser)?.timestamp ?? "";
+      return sort === "newest"
+        ? tsB.localeCompare(tsA)
+        : tsA.localeCompare(tsB);
+    });
+  }, [filtered, sort, currentUser]);
+
+  // Summary stats — computed from mine (pre-filter totals) not filtered (D-05, D-06 per plan deviation note)
+  const stats = useMemo(() => {
+    const likes = mine.filter(
+      (r) => r.col.find((e) => e.username === currentUser)?.action === "like"
+    ).length;
+    const dislikes = mine.filter(
+      (r) => r.col.find((e) => e.username === currentUser)?.action === "dislike"
+    ).length;
+    return { total: mine.length, likes, dislikes };
+  }, [mine, currentUser]);
+
   if (records.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-xl text-on-surface-variant">
