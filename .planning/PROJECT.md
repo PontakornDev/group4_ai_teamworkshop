@@ -10,7 +10,7 @@ A user can log in, swipe on dogs, and have their swipes saved — the loop must 
 
 ## Current State
 
-**Phase 3 complete 2026-05-11** — Full core loop working: login → swipe → persist. Phase 4 (History Page) is next. v1.0 milestone 70% complete.
+**Phase 5 complete 2026-05-13** — All phases shipped. Top Dogs leaderboard live on /history. v0.1 milestone 100% complete: login → swipe → history → leaderboard.
 
 ## Requirements
 
@@ -26,9 +26,17 @@ A user can log in, swipe on dogs, and have their swipes saved — the loop must 
 - Each swipe appends `{username, email, action, timestamp}` to the dog's `col` array in /data/swipes.json via lib/storage.ts appendAction ✓ (Phase 3)
 - Google avatar + display name visible in the navbar while swiping ✓ (Phase 3)
 
+### Validated (Phase 4 + Phase 5)
+
+- /history page shows all swipe records with dog thumbnails, actions, timestamps ✓ (Phase 4)
+- getTopDogs() aggregates col entries, returns top scorer per like/dislike category ✓ (Phase 5)
+- GET /api/stats exposes getTopDogs() over HTTP, no auth guard ✓ (Phase 5)
+- TopDogsSection renders Most Liked / Most Disliked cards with design tokens ✓ (Phase 5)
+- /history page renders Top Dogs leaderboard above swipe history ✓ (Phase 5)
+
 ### Active
 
-- [ ] /history page lists all swipe records grouped by username with summary bar, action filter, timestamp sort
+(none — all v0.1 requirements satisfied)
 
 ### Out of Scope
 
@@ -81,4 +89,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-11 — Phase 3 complete, core loop validated*
+*Last updated: 2026-05-13 — Phase 5 complete, v0.1 milestone shipped*
