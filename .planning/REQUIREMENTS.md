@@ -53,6 +53,14 @@
 - **POLISH-03**: Error state shown when random.dog API is unreachable
 - **POLISH-04**: Sign out button in navbar calls NextAuth `signOut()` and redirects to /login
 
+### Deploy
+
+- **DEPLOY-01**: `.env.local.example` exists at repo root with all four required env vars (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`) as empty placeholders
+- **DEPLOY-02**: `.gitignore` excludes `.env.local` and `data/swipes.json`
+- **DEPLOY-03**: `next.config.ts` has `images.remotePatterns` including `random.dog` hostname
+- **DEPLOY-04**: `README.md` documents local dev setup, required env vars, Vercel deploy steps, and known limitation (swipes.json resets on each Vercel deployment; future migration to Vercel KV / PlanetScale / Supabase recommended)
+- **DEPLOY-05**: Google OAuth authorized redirect URI includes `https://<project>.vercel.app/api/auth/callback/google`; `NEXTAUTH_URL` env var set to production Vercel URL
+
 ## Out of Scope
 
 | Feature | Reason |
@@ -88,11 +96,16 @@
 | TOP-02 | Phase 5 | Pending |
 | TOP-03 | Phase 5 | Pending |
 | TOP-04 | Phase 5 | Pending |
+| DEPLOY-01 | Phase 6 | Pending |
+| DEPLOY-02 | Phase 6 | Pending |
+| DEPLOY-03 | Phase 6 | Pending |
+| DEPLOY-04 | Phase 6 | Pending |
+| DEPLOY-05 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 13 total
-- v2 requirements: 8 total (HIST-01–04, TOP-01–04)
-- Mapped to phases: 21
+- v2 requirements: 13 total (HIST-01–04, TOP-01–04, DEPLOY-01–05)
+- Mapped to phases: 26
 - Unmapped: 0 ✓
 
 ---

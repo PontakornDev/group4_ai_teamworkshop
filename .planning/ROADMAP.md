@@ -24,6 +24,7 @@ Three vertical slices deliver the full core loop: API routes first (the data lay
 - [x] **Phase 3: Swipe UI** - Users can swipe on dogs with full like/dislike flow and persistence (complete 2026-05-11)
 - [ ] **Phase 4: History Page** - Show all like/dislike records grouped by username with summary bar, filters, and sort
 - [ ] **Phase 5: Top Dogs** - Most liked and most disliked dog highlight cards at the top of the history page, backed by `getTopDogs()` and GET `/api/stats`
+- [ ] **Phase 6: Deploy to Vercel** - Ship to production via GitHub → Vercel with env vars, OAuth redirect config, and known limitations documented
 
 ## Phase Details
 
@@ -94,6 +95,21 @@ Plans:
   6. Empty state: no cards shown (or placeholder) when swipes.json is empty
 **Plans**: TBD
 
+### Phase 6: Deploy to Vercel
+**Goal**: Ship the app to production on Vercel via GitHub with all environment variables configured, Google OAuth redirect URIs updated, and known limitations (ephemeral JSON storage) documented
+**Mode:** mvp
+**Depends on**: Phase 5
+**Requirements**: DEPLOY-01, DEPLOY-02, DEPLOY-03, DEPLOY-04, DEPLOY-05
+**Success Criteria** (what must be TRUE):
+  1. `.env.local.example` lists all four required env vars with placeholder values
+  2. `.env.local` and `data/swipes.json` are in `.gitignore`
+  3. `next.config.ts` includes `random.dog` in `images.remotePatterns`
+  4. `README.md` covers local setup, env vars, known limitations, and Vercel deploy steps
+  5. Google login works on the production Vercel URL
+  6. Swipe page loads dog images from random.dog on production
+  7. History page shows records correctly on production (resets on redeploy — documented and expected)
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -103,3 +119,4 @@ Plans:
 | 3. Swipe UI | 2/3 | 🔧 Code review fixes pending | 2026-05-11 |
 | 4. History Page | 0/? | Not started | - |
 | 5. Top Dogs | 0/? | Not started | - |
+| 6. Deploy to Vercel | 0/? | Not started | - |
