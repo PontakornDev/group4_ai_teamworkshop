@@ -22,8 +22,8 @@ Three vertical slices deliver the full core loop: API routes first (the data lay
 
 - [x] **Phase 2: Login Page** - Users sign in with Google (NextAuth) and the app guards /swipe access
 - [x] **Phase 3: Swipe UI** - Users can swipe on dogs with full like/dislike flow and persistence (complete 2026-05-11)
-- [ ] **Phase 4: History Page** - Show all like/dislike records grouped by username with summary bar, filters, and sort
-- [ ] **Phase 5: Top Dogs** - Most liked and most disliked dog highlight cards at the top of the history page, backed by `getTopDogs()` and GET `/api/stats`
+- [x] **Phase 4: History Page** - Show all like/dislike records grouped by username with summary bar, filters, and sort (complete 2026-05-12)
+- [x] **Phase 5: Top Dogs** - Most liked and most disliked dog highlight cards at the top of the history page, backed by `getTopDogs()` and GET `/api/stats` (complete 2026-05-13)
 - [ ] **Phase 6: Deploy to Vercel** - Ship to production via GitHub → Vercel with env vars, OAuth redirect config, and known limitations documented
 
 ## Phase Details
@@ -93,7 +93,7 @@ Plans:
   4. Cards display dog image thumbnail, dogId label, and numeric count (e.g. "12 likes")
   5. Cards match design system: Quicksand font, `#9b4500` primary, 24px border radius, design system shadow
   6. Empty state: no cards shown (or placeholder) when swipes.json is empty
-**Plans**: TBD
+**Plans**: Complete
 
 ### Phase 6: Deploy to Vercel
 **Goal**: Ship the app to production on Vercel via GitHub with all environment variables configured, Google OAuth redirect URIs updated, and known limitations (ephemeral JSON storage) documented
@@ -117,6 +117,6 @@ Plans:
 | 1. API Layer | 1/1 | ✅ Complete | 2026-05-08 |
 | 2. Login Page | 2/2 | ✅ Complete | 2026-05-10 |
 | 3. Swipe UI | 2/3 | 🔧 Code review fixes pending | 2026-05-11 |
-| 4. History Page | 0/? | Not started | - |
-| 5. Top Dogs | 0/? | Not started | - |
+| 4. History Page | 2/2 | ✅ Complete | 2026-05-12 |
+| 5. Top Dogs | 2/2 | ✅ Complete | 2026-05-13 |
 | 6. Deploy to Vercel | 0/? | Not started | - |
