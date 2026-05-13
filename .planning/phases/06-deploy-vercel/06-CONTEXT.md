@@ -9,10 +9,10 @@
 Ship the Dog Tinder app to production on Vercel via GitHub. All env vars configured in Vercel dashboard, Google OAuth redirect URIs updated, and the ephemeral-storage limitation documented.
 
 **What Phase 6 delivers:**
-- `.env.local.example` — all four required env vars as empty placeholders
+- `.env.local.example` — all four required env vars as placeholders
 - `.gitignore` audit — confirm `.env.local` and `data/swipes.json` excluded
-- `next.config.ts` — verify `images.remotePatterns` includes `random.dog`
-- `README.md` — local dev setup, env vars table, Vercel deploy walkthrough, known limitations
+- `next.config.ts` — verify `images.remotePatterns` includes `random.dog` and `lh3.googleusercontent.com`
+- `README.md` — workshop quick-start: local dev setup, env vars table, 5-step Vercel deploy walkthrough, known limitations
 - CLAUDE.md note — swipes.json resets on each deployment; recommend persistent store for v2
 - Production verification checklist — Google login, swipe page, history page all working on Vercel URL
 
@@ -27,29 +27,38 @@ Ship the Dog Tinder app to production on Vercel via GitHub. All env vars configu
 ## Implementation Decisions
 
 ### Environment variables
-- **D-01:** Four required vars: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
+- **D-01:** Four required vars: `CLIENT_ID`, `CLIENT_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
+  - `CLIENT_ID`/`CLIENT_SECRET` is the NextAuth v5 convention — confirmed in `auth.ts` and `STATE.md`
+  - Do NOT use `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` — those are NOT what the code reads
 - **D-02:** `NEXTAUTH_URL` must equal the exact Vercel production URL (e.g. `https://your-project.vercel.app`) — no trailing slash
 - **D-03:** `NEXTAUTH_SECRET` generate with `openssl rand -base64 32`; document this command in README.md
 
 ### .gitignore
 - **D-04:** `.env.local` must not be committed — contains real credentials
 - **D-05:** `data/swipes.json` must not be committed — causes merge conflicts across teammates; resets cleanly on each deploy anyway
+- **Status:** Neither is currently in `.gitignore` — both must be added
 
 ### next.config.ts — image domains
-- **D-06:** `images.remotePatterns` must include `{ protocol: 'https', hostname: 'random.dog' }` — Next.js Image component blocks unlisted hostnames
-- **D-07:** Also verify `lh3.googleusercontent.com` is included for Google avatar images (used by Navbar)
+- **D-06:** `images.remotePatterns` already includes `random.dog` and `lh3.googleusercontent.com` ✓ — no change needed
+- **Status:** Already correct as of codebase scout
+
+### .env.local.example
+- **D-07:** `NEXTAUTH_URL` in example file should be production URL placeholder (`https://your-project.vercel.app`), not localhost
+  - Rationale: Example communicates what the real value looks like; local dev setup covered in README
+- **D-08:** Use `CLIENT_ID`/`CLIENT_SECRET` naming (not GOOGLE_*) to match actual code in `auth.ts`
 
 ### Storage limitation
-- **D-08:** Vercel serverless functions run in ephemeral containers — `data/swipes.json` written during one request may not persist to the next invocation, and is wiped on every new deployment
-- **D-09:** Document this as a known limitation in README.md and CLAUDE.md; recommend Vercel KV (simplest drop-in) or Supabase as migration path
-- **D-10:** No code change to storage layer in this phase — limitation is accepted for workshop prototype
+- **D-09:** Vercel serverless functions run in ephemeral containers — `data/swipes.json` written during one request may not persist to the next invocation, and is wiped on every new deployment
+- **D-10:** Document this as a known limitation in README.md and CLAUDE.md; recommend Vercel KV (simplest drop-in) or Supabase as migration path
+- **D-11:** No code change to storage layer in this phase — limitation is accepted for workshop prototype
 
 ### Google OAuth redirect URI
-- **D-11:** Must add `https://<project>.vercel.app/api/auth/callback/google` to "Authorized redirect URIs" in Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client
-- **D-12:** Local `http://localhost:3000/api/auth/callback/google` must remain in the list (do not remove it)
+- **D-12:** Must add `https://<project>.vercel.app/api/auth/callback/google` to "Authorized redirect URIs" in Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client
+- **D-13:** Local `http://localhost:3000/api/auth/callback/google` must remain in the list (do not remove it)
 
-### README structure
-- **D-13:** README sections: Project Description → Tech Stack → Local Development → Environment Variables → Deploy to Vercel → Known Limitations → Future Improvements
+### README structure (workshop quick-start, ~1-2 pages)
+- **D-14:** Sections: Project Description → Tech Stack → Local Development → Environment Variables → Deploy to Vercel → Known Limitations → Future Improvements
+- **D-15:** Scope: enough for a teammate to clone and run locally + deploy to Vercel. No architecture deep-dive.
 
 </decisions>
 
@@ -58,22 +67,22 @@ Ship the Dog Tinder app to production on Vercel via GitHub. All env vars configu
 
 **Downstream agents MUST read these before planning or implementing.**
 
-### Config files to verify/update
-- `next.config.ts` — check `images.remotePatterns`; add `random.dog` and `lh3.googleusercontent.com` if absent
-- `.gitignore` — verify `.env.local` and `data/swipes.json` present; add if missing
-- `package.json` — check `name`, `version` for README reference
-
 ### Auth config
-- `auth.ts` — NextAuth v5 config; `NEXTAUTH_URL` read from `process.env.NEXTAUTH_URL` automatically by NextAuth; no code change needed
+- `auth.ts` — NextAuth v5 config; uses `process.env.CLIENT_ID` and `process.env.CLIENT_SECRET` (not GOOGLE_* prefixed); `NEXTAUTH_URL` read automatically by NextAuth; no code change needed
 
-### CLAUDE.md
-- `/Users/c.ptk/Desktop/product/claude-ai/group4_ai_teamworkshop/CLAUDE.md` — add storage limitation note under "Decisions Made" section
+### Config files to verify/update
+- `next.config.ts` — already has both `random.dog` and `lh3.googleusercontent.com` in remotePatterns; no change needed
+- `.gitignore` — missing `.env.local` and `data/swipes.json`; both must be added
+- `.env.local.example` — exists; uses CLIENT_ID/CLIENT_SECRET correctly; NEXTAUTH_URL should be updated to production placeholder
+
+### Documentation
+- `CLAUDE.md` — add storage limitation note under "Decisions Made" section
 
 ### Requirements
 - `.planning/REQUIREMENTS.md` — DEPLOY-01, DEPLOY-02, DEPLOY-03, DEPLOY-04, DEPLOY-05
 
 ### Prior phase context
-- `.planning/phases/02-login-page/02-CONTEXT.md` — env var list, NextAuth setup, Google provider config
+- `.planning/phases/02-login-page/02-CONTEXT.md` — NextAuth setup, Google provider config
 
 </canonical_refs>
 
@@ -81,36 +90,29 @@ Ship the Dog Tinder app to production on Vercel via GitHub. All env vars configu
 ## Existing Code Insights
 
 ### Files that need changes
-- `next.config.ts` — likely missing `random.dog` in remotePatterns; verify before assuming
-- `.gitignore` — verify both `.env.local` and `data/swipes.json` are excluded
+- `.gitignore` — add `.env.local` and `data/swipes.json`
+- `.env.local.example` — update `NEXTAUTH_URL` value to production placeholder; variable names already correct
+- `README.md` — full rewrite from boilerplate to project-specific quick-start
 - `CLAUDE.md` — add one-sentence storage limitation note
 
-### Files that need to be created
-- `.env.local.example` — new file, four empty vars
-- `README.md` — new file, full project documentation
+### Files that are already correct
+- `next.config.ts` — both hostnames configured ✓
+- `auth.ts` — reads correct env var names (`CLIENT_ID`, `CLIENT_SECRET`) ✓
 
 ### Files that do NOT need changes
-- `auth.ts` — NextAuth reads `NEXTAUTH_URL` from env automatically
-- `lib/storage.ts` — no change; limitation is documented, not fixed
+- `lib/storage.ts` — no change; limitation documented, not fixed
 - Any component or API route — no code change required for deploy phase
 
-### Known next.config.ts pattern (Next.js 14 App Router)
-```ts
-const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'random.dog' },
-      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
-    ],
-  },
-};
+### .env.local.example target state
 ```
+# Google OAuth credentials (from Google Cloud Console → APIs & Services → Credentials → OAuth 2.0)
+CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+CLIENT_SECRET=your-google-client-secret
 
-### .env.local.example template
-```
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-NEXTAUTH_SECRET=
+# NextAuth secret — generate with: openssl rand -base64 32
+NEXTAUTH_SECRET=your-nextauth-secret-32-chars-min
+
+# App URL — set to your Vercel production URL after first deploy
 NEXTAUTH_URL=https://your-project.vercel.app
 ```
 
@@ -120,20 +122,19 @@ NEXTAUTH_URL=https://your-project.vercel.app
 ## Specific Implementation Notes
 
 ### Pre-deploy checklist (execute in order)
-1. Audit `.gitignore` — add `.env.local` and `data/swipes.json` if missing
-2. Create `.env.local.example` at repo root
-3. Update `next.config.ts` — add `remotePatterns` for `random.dog` and `lh3.googleusercontent.com`
-4. Write `README.md`
-5. Add storage limitation note to `CLAUDE.md` under "Decisions Made"
-6. Commit all changes
+1. Add `.env.local` and `data/swipes.json` to `.gitignore`
+2. Update `.env.local.example` — change `NEXTAUTH_URL` to production placeholder
+3. Write `README.md` (workshop quick-start format)
+4. Add storage limitation note to `CLAUDE.md` under "Decisions Made"
+5. Commit all changes
 
 ### Vercel deploy steps (document in README.md)
 1. Push repo to GitHub (if not already)
 2. Go to vercel.com → New Project → Import GitHub repo
 3. Framework preset: Next.js (auto-detected)
 4. Add environment variables in Vercel dashboard:
-   - `GOOGLE_CLIENT_ID` — from Google Cloud Console
-   - `GOOGLE_CLIENT_SECRET` — from Google Cloud Console
+   - `CLIENT_ID` — from Google Cloud Console
+   - `CLIENT_SECRET` — from Google Cloud Console
    - `NEXTAUTH_SECRET` — generate: `openssl rand -base64 32`
    - `NEXTAUTH_URL` — set to `https://<your-project>.vercel.app`
 5. Deploy
