@@ -102,6 +102,16 @@
   .text-label-sm { font-weight: 700; }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes paw-bounce {
+  0%, 100% { transform: scale(1) rotate(-10deg); opacity: 0.4; }
+  50% { transform: scale(1.25) rotate(-10deg); opacity: 0.85; }
+}
+
 /* Material Symbols */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;

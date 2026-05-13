@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 
 interface DogSummary {
@@ -21,6 +21,12 @@ export default function DogImageModal({
   dog,
   onClose,
 }: DogImageModalProps) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+
+  useEffect(() => {
+    setImgLoaded(false);
+  }, [dog?.imageUrl]);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -71,12 +77,19 @@ export default function DogImageModal({
 
           {/* Image */}
           <div className="relative max-w-[90vw] max-h-[80vh] rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.32)]">
+            {!imgLoaded && (
+              <div
+                className="absolute inset-0 bg-surface-container-low animate-pulse"
+                style={{ minWidth: 200, minHeight: 200 }}
+              />
+            )}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={dog.imageUrl}
               alt={`Dog ${dog.dogId.slice(0, 8)}`}
-              className="block max-w-[90vw] max-h-[80vh] object-contain"
+              className={`block max-w-[90vw] max-h-[80vh] object-contain transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
               style={{ minWidth: 200, minHeight: 200 }}
+              onLoad={() => setImgLoaded(true)}
             />
           </div>
 
