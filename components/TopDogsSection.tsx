@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import DogImageModal from "./DogImageModal";
 import type { TopDogsResult } from "@/lib/storage";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 interface TopDogsSectionProps {
   topDogs: TopDogsResult | null;
@@ -102,6 +103,11 @@ export default function TopDogsSection({ topDogs }: TopDogsSectionProps) {
                     className="object-cover"
                     unoptimized
                   />
+                  {isLiked && (
+                    <div className="absolute top-2 right-2 bg-yellow-400 rounded-full w-8 h-8 flex items-center justify-center shadow-md">
+                      <FavoriteIcon sx={{ fontSize: 16, color: "white" }} />
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-sm flex flex-col gap-xs">
