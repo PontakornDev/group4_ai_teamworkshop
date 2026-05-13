@@ -47,9 +47,12 @@ export async function findUnseenDog(
   return dogs.find((d) => !d.col.some((a) => a.username === username)) ?? null;
 }
 
-export async function getHistoryWithCounts(): Promise<DogSummary[]> {
+export async function getHistoryWithCounts(username?: string): Promise<DogSummary[]> {
   const dogs = await readDogs();
-  return dogs.map((d) => ({
+  const filtered = username
+    ? dogs.filter((d) => d.col.some((a) => a.username === username))
+    : dogs;
+  return filtered.map((d) => ({
     dogId: d.dogId,
     imageUrl: d.imageUrl,
     likeCount: d.col.filter((c) => c.action === "like").length,

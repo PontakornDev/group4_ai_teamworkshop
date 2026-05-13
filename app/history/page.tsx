@@ -9,7 +9,7 @@ export default async function HistoryPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const records = await getHistoryWithCounts();
+  const records = await getHistoryWithCounts(session.user.name ?? undefined);
   const topDogs = await getTopDogs();
 
   return (
