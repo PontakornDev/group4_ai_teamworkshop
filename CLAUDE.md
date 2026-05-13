@@ -108,6 +108,7 @@ Records are grouped by dog — one entry per dogId, multiple user actions in col
 - col entries include email for future deduplication / multi-user queries
 - GET /api/dog?username= serves unseen dogs first — avoids redundant random.dog calls when storage has unseen dogs
 - lib/storage.ts owns all JSON read/write — routes call findUnseenDog/appendAction, never read fs directly
+- Storage limitation: data/swipes.json is ephemeral on Vercel — resets on every deploy and may not persist between function invocations; documented in README, migration to Vercel KV recommended for v2
 
 ## Design Reference
 - UI design exported from Stitch — located at /design/**/*.md and /design/**/*.html
