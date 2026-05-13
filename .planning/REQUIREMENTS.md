@@ -96,10 +96,10 @@
 | TOP-02 | Phase 5 | Complete |
 | TOP-03 | Phase 5 | Complete |
 | TOP-04 | Phase 5 | Complete |
-| DEPLOY-01 | Phase 6 | Pending |
-| DEPLOY-02 | Phase 6 | Pending |
-| DEPLOY-03 | Phase 6 | Pending |
-| DEPLOY-04 | Phase 6 | Pending |
+| DEPLOY-01 | Phase 6 | Complete |
+| DEPLOY-02 | Phase 6 | Complete |
+| DEPLOY-03 | Phase 6 | Complete |
+| DEPLOY-04 | Phase 6 | Complete |
 | DEPLOY-05 | Phase 6 | Pending |
 
 **Coverage:**

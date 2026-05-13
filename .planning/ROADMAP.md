@@ -112,7 +112,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 06-01-PLAN.md — Update .env.local.example (NEXTAUTH_URL → production placeholder), verify .gitignore + next.config.ts, rewrite README.md as workshop quick-start, add storage limitation note to CLAUDE.md
+- [x] 06-01-PLAN.md — Update .env.local.example (NEXTAUTH_URL → production placeholder), verify .gitignore + next.config.ts, rewrite README.md as workshop quick-start, add storage limitation note to CLAUDE.md
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 06-02-PLAN.md — Human-driven Vercel deploy: import repo, set env vars, register Google OAuth redirect URI, verify full sign-in / swipe / history loop on production URL, record outcome in SUMMARY
@@ -126,4 +126,4 @@ Plans:
 | 3. Swipe UI | 2/3 | 🔧 Code review fixes pending | 2026-05-11 |
 | 4. History Page | 2/2 | ✅ Complete | 2026-05-12 |
 | 5. Top Dogs | 2/2 | ✅ Complete | 2026-05-13 |
-| 6. Deploy to Vercel | 0/2 | Not started | - |
+| 6. Deploy to Vercel | 1/2 | In Progress|  |
