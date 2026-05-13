@@ -1,8 +1,7 @@
-import fs from "fs/promises";
-import path from "path";
+import { Redis } from "@upstash/redis";
 
-const DATA_DIR = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "data");
-const SWIPES_FILE = path.join(DATA_DIR, "swipes.json");
+const redis = Redis.fromEnv();
+const KV_KEY = "swipes";
 
 export interface SwipeAction {
   username: string;
@@ -25,19 +24,12 @@ export interface DogSummary {
   latestTimestamp: string;
 }
 
-export async function ensureStore(): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  try {
-    await fs.access(SWIPES_FILE);
-  } catch {
-    await fs.writeFile(SWIPES_FILE, "[]", "utf-8");
-  }
+async function readDogs(): Promise<DogRecord[]> {
+  return (await redis.get<DogRecord[]>(KV_KEY)) ?? [];
 }
 
-export async function readDogs(): Promise<DogRecord[]> {
-  await ensureStore();
-  const raw = await fs.readFile(SWIPES_FILE, "utf-8");
-  return JSON.parse(raw) as DogRecord[];
+async function writeDogs(dogs: DogRecord[]): Promise<void> {
+  await redis.set(KV_KEY, dogs);
 }
 
 export async function findUnseenDog(
@@ -71,7 +63,6 @@ export async function appendAction(
   email: string,
   action: "like" | "dislike",
 ): Promise<DogRecord> {
-  await ensureStore();
   const dogs = await readDogs();
   const entry: SwipeAction = {
     username,
@@ -85,7 +76,7 @@ export async function appendAction(
   } else {
     dogs.push({ dogId, imageUrl, col: [entry] });
   }
-  await fs.writeFile(SWIPES_FILE, JSON.stringify(dogs, null, 2), "utf-8");
+  await writeDogs(dogs);
   return dogs.find((d) => d.dogId === dogId)!;
 }
 
@@ -124,28 +115,12 @@ export async function getTopDogs(): Promise<TopDogsResult> {
     const likeCount = dog.col.filter((a) => a.action === "like").length;
     const dislikeCount = dog.col.filter((a) => a.action === "dislike").length;
 
-    if (
-      likeCount > 0 &&
-      (mostLiked === null || likeCount > mostLiked.likeCount)
-    ) {
-      mostLiked = {
-        dogId: dog.dogId,
-        imageUrl: dog.imageUrl,
-        likeCount,
-        dislikeCount,
-      };
+    if (likeCount > 0 && (mostLiked === null || likeCount > mostLiked.likeCount)) {
+      mostLiked = { dogId: dog.dogId, imageUrl: dog.imageUrl, likeCount, dislikeCount };
     }
 
-    if (
-      dislikeCount > 0 &&
-      (mostDisliked === null || dislikeCount > mostDisliked.dislikeCount)
-    ) {
-      mostDisliked = {
-        dogId: dog.dogId,
-        imageUrl: dog.imageUrl,
-        likeCount,
-        dislikeCount,
-      };
+    if (dislikeCount > 0 && (mostDisliked === null || dislikeCount > mostDisliked.dislikeCount)) {
+      mostDisliked = { dogId: dog.dogId, imageUrl: dog.imageUrl, likeCount, dislikeCount };
     }
   }
 
