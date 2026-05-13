@@ -2,13 +2,15 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import HistoryList from "@/components/HistoryList";
-import { getHistoryWithCounts } from "@/lib/storage";
+import TopDogsSection from "@/components/TopDogsSection";
+import { getHistoryWithCounts, getTopDogs } from "@/lib/storage";
 
 export default async function HistoryPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
   const records = await getHistoryWithCounts();
+  const topDogs = await getTopDogs();
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex antialiased">
@@ -38,6 +40,7 @@ export default async function HistoryPage() {
             </div>
           </div>
 
+          <TopDogsSection topDogs={topDogs} />
           <HistoryList records={records} />
         </div>
       </main>
